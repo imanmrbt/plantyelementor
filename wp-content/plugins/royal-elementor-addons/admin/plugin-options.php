@@ -29,8 +29,10 @@ function wpr_settings_link( $links ) {
     $settings_link = '<a href="admin.php?page=wpr-addons">Settings</a>';
     array_push( $links, $settings_link );
 
-    if ( !is_plugin_installed('wpr-addons-pro/wpr-addons-pro.php') ) {
+    if ( !is_plugin_installed('wpr-addons-pro/wpr-addons-pro.php') ) { // GOGA - Check if ok
         $links[] = '<a href="https://royal-elementor-addons.com/?ref=rea-plugin-backend-wpplugindashboard-upgrade-pro#purchasepro" style="color:#93003c;font-weight:700" target="_blank">' . esc_html__('Go Pro', 'wpr-addons') . '</a>';
+    } elseif ( !wpr_fs()->is_plan( 'expert' ) ) {
+        $links[] = '<a href="https://royal-elementor-addons.com/?ref=rea-plugin-backend-wpplugindashboard-upgrade-expert#purchasepro" style="color:#93003c;font-weight:700" target="_blank">' . esc_html__('Go Expert', 'wpr-addons') . '</a>';
     }
 
     return $links;
@@ -56,6 +58,7 @@ function wpr_register_addons_settings() {
     register_setting( 'wpr-settings', 'wpr_override_woo_templates' );
     register_setting( 'wpr-settings', 'wpr_enable_product_image_zoom' );
     register_setting( 'wpr-settings', 'wpr_enable_woo_flexslider_navigation' );
+    register_setting( 'wpr-settings', 'wpr_add_wishlist_to_my_account' );
     register_setting( 'wpr-settings', 'wpr_woo_shop_ppp' );
     register_setting( 'wpr-settings', 'wpr_woo_shop_cat_ppp' );
     register_setting( 'wpr-settings', 'wpr_woo_shop_tag_ppp' );
@@ -336,6 +339,8 @@ function wpr_addons_settings_page() {
             <p class='wpr-install-activate-woocommerce'><span class="dashicons dashicons-info-outline"></span> <?php esc_html_e( 'Install/Activate WooCommerce to use these widgets', 'wpr-addons' ); ?></p>
         <?php endif; ?>
         <a href="https://youtu.be/f_3tNiBC3dw?t=238" target="_blank"><?php esc_html_e( 'How to use WooCommerce Builder Widgets', 'wpr-addons' ); ?></a>
+        <br><br>
+        <a href="https://www.youtube.com/watch?v=wis1rQTn1tg" target="_blank"><?php esc_html_e( 'How to use Wishlist & Compare', 'wpr-addons' ); ?></a>
     </div>
     <div class="wpr-elements wpr-elements-woo">
     <?php
@@ -389,7 +394,7 @@ function wpr_addons_settings_page() {
         <img src="<?php echo esc_url(WPR_ADDONS_ASSETS_URL .'img/not-found.png'); ?>">
         <h1><?php esc_html_e('No Search Results Found.', 'wpr-addons'); ?></h1>
         <p><?php esc_html_e('Cant find a Widget you are looking for?', 'wpr-addons'); ?></p>
-        <a href="https://forms.clickup.com/1856033/f/1rmh1-5143/UIYNBNA8STCBOTXGNV" target="_blank"><?php esc_html_e('Request a New Widget', 'wpr-addons'); ?></a>
+        <a href="https://royaladdons.frill.co/b/6m4d5qm4/feature-ideas" target="_blank"><?php esc_html_e('Request a New Widget', 'wpr-addons'); ?></a>
     </div>
 
     <?php //submit_button( '', 'wpr-options-button' ); ?>
@@ -474,6 +479,16 @@ function wpr_addons_settings_page() {
             </div>
 
             <?php if ( wpr_fs()->is_plan( 'expert' ) ) : ?>
+            
+            <div class="wpr-woo-template-info">
+                <div class="wpr-woo-template-title">
+                    <h4>Add Wishlist To My Account</h4>
+                    <span>Adds wishlist menu item to my account widget</span>
+                </div>
+                <input type="checkbox" name="wpr_add_wishlist_to_my_account" id="wpr_add_wishlist_to_my_account" <?php echo checked( get_option('wpr_add_wishlist_to_my_account', 'on'), 'on', false ); ?>>
+                <label for="wpr_add_wishlist_to_my_account"></label>
+            </div>
+
             <div class="wpr-woo-template-info wpr-compare-wishlist">
                 <?php
                     $pages = get_pages(); // Get all pages on the site
@@ -505,6 +520,10 @@ function wpr_addons_settings_page() {
                     echo '</select>';
                 ?>
             </div>
+            
+            <h4>
+                <a href="https://youtu.be/wis1rQTn1tg?t=97" target="_blank"><?php esc_html_e( 'How to use Wishlist & Compare pages', 'wpr-addons' ); ?></a>
+            </h4>
             <?php endif; ?>
             
         </div>
@@ -758,6 +777,7 @@ function wpr_addons_settings_page() {
                         <ul>
                             <li>Grid Columns 1,2,3,4,5,6</li>
                             <li>Custom Post Types Support (Expert)</li>
+                            <li>Secondary Featured Image on Hover</li>
                             <li>Masonry Layout</li>
                             <li>List Layout Zig-zag</li>
                             <li>Posts Slider Columns (Carousel) 1,2,3,4,5,6</li>
@@ -1251,6 +1271,7 @@ function wpr_addons_settings_page() {
                 <ul>
                     <li><span>Dedicated Support</span></li>
                     <li><span>Free and Pro Functionality Included</span></li>
+                    <li><span>Extended Custom Field Options </span></li>
                     <li><span>Ability to build Dynamic Websites</span></li>
                     <li><span>Dynamic Tags for All Widgets</span></li>
                     <li><span>Extended Custom Field Options</span></li>
@@ -1258,7 +1279,9 @@ function wpr_addons_settings_page() {
                     <li><span>Custom Taxonomy Generator</span></li>
                     <li><span>WooCommerce Wishlist Widget</span></li>
                     <li><span>WooCommerce Compare Widget</span></li>
+                    <li><span>Category Grid Widget</span></li>
                     <li><span>White Label Branding</span></li>
+                    <li><span>Elementor Pro Not Required</span></li>
                     <li>And More is Comming Soon...</li>
                 </ul>
             </div>
@@ -1395,10 +1418,19 @@ add_action( 'admin_head', 'wpr_redirect_support_page' );
 
 // Add Upgrade Sub Menu item that will redirect to royal-elementor-addons.com
 function wpr_addons_add_upgrade_menu() {
-    if ( defined('WPR_ADDONS_PRO_VERSION') ) return;
-    add_submenu_page( 'wpr-addons', 'Upgrade', 'Upgrade', 'manage_options', 'wpr-upgrade', 'wpr_addons_upgrade_page', 99 );
+    if ( defined('WPR_ADDONS_PRO_VERSION') && !wpr_fs()->can_use_premium_code() ) return;
+
+    if ( wpr_fs()->is_plan( 'expert' ) ) return;
+
+    if ( !wpr_fs()->can_use_premium_code() ) {
+        $label = 'Upgrade';
+    } else if ( wpr_fs()->is_plan( 'pro' ) ) {
+        $label = 'Upgrade to Expert';
+    }
+
+    add_submenu_page( 'wpr-addons', $label, $label, 'manage_options', 'wpr-upgrade', 'wpr_addons_upgrade_page', 999 );
 }
-add_action( 'admin_menu', 'wpr_addons_add_upgrade_menu', 99 );
+add_action( 'admin_menu', 'wpr_addons_add_upgrade_menu', 999999999999 );
 
 function wpr_addons_upgrade_page() {}
 
@@ -1406,7 +1438,8 @@ function wpr_redirect_upgrade_page() {
     ?>
     <script type="text/javascript">
         jQuery(document).ready( function($) {
-            $( 'ul#adminmenu a[href*="page=wpr-upgrade"]' ).attr('href', 'https://royal-elementor-addons.com/?ref=rea-plugin-backend-menu-upgrade-pro#purchasepro').attr( 'target', '_blank' );
+            let ref = 'Upgrade to Expert' == $( 'ul#adminmenu a[href*="page=wpr-upgrade"]' ).text() ? 'expert' : 'pro';
+            $( 'ul#adminmenu a[href*="page=wpr-upgrade"]' ).attr('href', 'https://royal-elementor-addons.com/?ref=rea-plugin-backend-menu-upgrade-'+ ref +'#purchasepro').attr( 'target', '_blank' );
             $( 'ul#adminmenu a[href*="#purchasepro"]' ).css('color', 'greenyellow');
         });
     </script>

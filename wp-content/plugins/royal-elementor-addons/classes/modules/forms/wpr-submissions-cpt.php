@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     public function __construct() {
         add_action('wp_ajax_wpr_form_builder_submissions' , [$this, 'add_to_submissions']);
         add_action('wp_ajax_nopriv_wpr_form_builder_submissions',[$this, 'add_to_submissions']);
-       add_action('save_post', [$this, 'update_submissions_post_meta']);
+        add_action('save_post', [$this, 'update_submissions_post_meta']);
     }
 
     public function add_to_submissions() {
@@ -58,7 +58,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             wp_send_json_success(array(
                 'action' => 'wpr_form_builder_submissions',
                 'post_id' => $post_id,
-                'message' => esc_html__('Submission created successfully '),
+                'message' => esc_html__('Submission created successfully', 'wpr-addons'),
 				'status' => 'success',
                 'content' => $_POST['form_content']
             ));
@@ -66,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             wp_send_json_success(array(
                 'action' => 'wpr_form_builder_submissions',
                 'post_id' => $post_id,
-                'message' => esc_html__('Submit action failed'),
+                'message' => esc_html__('Submit action failed', 'wpr-addons'),
 				'status' => 'error'
             ));
         }

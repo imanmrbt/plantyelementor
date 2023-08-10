@@ -592,7 +592,7 @@ class Wpr_Woo_Grid extends Widget_Base {
 		);
 
 		// Get Available Meta Keys
-		$post_meta_keys = Utilities::get_custom_meta_keys();
+		// $post_meta_keys = Utilities::get_custom_meta_keys();
 
 		$this->add_control_query_selection();
 
@@ -766,13 +766,13 @@ class Wpr_Woo_Grid extends Widget_Base {
 		// 	);
 		// }
 
-		$this->add_control(
-			'post_meta_keys_filter',
-			[
-				'type' => Controls_Manager::HIDDEN,
-				'default' => json_encode( $post_meta_keys[0] ),
-			]
-		);
+		// $this->add_control(
+		// 	'post_meta_keys_filter',
+		// 	[
+		// 		'type' => Controls_Manager::HIDDEN,
+		// 		'default' => json_encode( $post_meta_keys[0] ),
+		// 	]
+		// );
 
 		$this->end_controls_section(); // End Controls Section
 
@@ -1308,6 +1308,19 @@ class Wpr_Woo_Grid extends Widget_Base {
 			]
 		);
 
+		$repeater->add_control(
+			'wishlist_compare_video_tutorial',
+			[
+				'type' => Controls_Manager::RAW_HTML,
+				'raw' => __( '<ul><li><a href="https://www.youtube.com/watch?v=wis1rQTn1tg" target="_blank" style="color: #93003c;"><strong>Watch Video Tutorial <span class="dashicons dashicons-video-alt3"></strong></a></li></ul>', 'wpr-addons' ),
+				'separator' => 'after',
+				// 'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+				'condition' => [
+					'element_select' => ['wishlist-button', 'compare-button']
+				]
+			]
+		);
+
 		// Upgrade to Pro Notice
 		Utilities::upgrade_pro_notice( $repeater, Controls_Manager::RAW_HTML, 'woo-grid', 'element_select', ['pro-lk', 'pro-shr', 'pro-sd'] );
 
@@ -1613,10 +1626,13 @@ class Wpr_Woo_Grid extends Widget_Base {
 			'element_lightbox_pfa_meta',
 			[
 				'label' => esc_html__( 'Audio Meta Value', 'wpr-addons' ),
-				'type' => Controls_Manager::SELECT2,
+				// 'type' => Controls_Manager::SELECT2,
+				'type' => 'wpr-ajax-select2',
 				'label_block' => true,
 				'default' => 'default',
-				'options' => $post_meta_keys[1],
+				// 'options' => $post_meta_keys[1],
+				'options' => 'ajaxselect2/get_custom_meta_keys',
+				'query_slug' => 'product_cat',
 				'condition' => [
 					'element_select' => 'lightbox',
 					'element_lightbox_pfa_select' => 'meta',
@@ -1644,10 +1660,13 @@ class Wpr_Woo_Grid extends Widget_Base {
 			'element_lightbox_pfv_meta',
 			[
 				'label' => esc_html__( 'Video Meta Value', 'wpr-addons' ),
-				'type' => Controls_Manager::SELECT2,
+				// 'type' => Controls_Manager::SELECT2,
+				'type' => 'wpr-ajax-select2',
 				'label_block' => true,
 				'default' => 'default',
-				'options' => $post_meta_keys[1],
+				// 'options' => $post_meta_keys[1],
+				'options' => 'ajaxselect2/get_custom_meta_keys',
+				'query_slug' => 'product_cat',
 				'condition' => [
 					'element_select' => 'lightbox',
 					'element_lightbox_pfv_select' => 'meta',
@@ -2189,6 +2208,19 @@ class Wpr_Woo_Grid extends Widget_Base {
 				'label' => esc_html__( 'Animation Transparency', 'wpr-addons' ),
 				'type' => Controls_Manager::SWITCHER,
 				'default' => 'yes',
+				'return_value' => 'yes',
+				'condition' => [
+					'element_animation!' => 'none',
+					'element_location' => 'over' 
+				],
+			]
+		);
+
+		$repeater->add_control(
+			'element_animation_disable_mobile',
+			[
+				'label' => esc_html__( 'Disable on Mobile/Tablet', 'wpr-addons' ),
+				'type' => Controls_Manager::SWITCHER,
 				'return_value' => 'yes',
 				'condition' => [
 					'element_animation!' => 'none',
@@ -8552,13 +8584,27 @@ class Wpr_Woo_Grid extends Widget_Base {
 		} else {
 			$settings = $this->get_settings();
 
-			foreach ( get_object_taxonomies( 'product' ) as $tax ) {
-				if ( ! empty($settings[ 'query_taxonomy_'. $tax ]) ) {
+			if ( isset($_GET['category']) ) {
+				
+				if ( $_GET['category'] != '0' ) {
+					// Get category from URL
+					$category = sanitize_text_field($_GET['category']);
+				
 					array_push( $tax_query, [
-						'taxonomy' => $tax,
+						'taxonomy' => 'product_cat',
 						'field' => 'id',
-						'terms' => $settings[ 'query_taxonomy_'. $tax ]
+						'terms' => $category
 					] );
+				}
+			} else {
+				foreach ( get_object_taxonomies( 'product' ) as $tax ) {
+					if ( ! empty($settings[ 'query_taxonomy_'. $tax ]) ) {
+						array_push( $tax_query, [
+							'taxonomy' => $tax,
+							'field' => 'id',
+							'terms' => $settings[ 'query_taxonomy_'. $tax ]
+						] );
+					}
 				}
 			}
 		}
@@ -8612,6 +8658,13 @@ class Wpr_Woo_Grid extends Widget_Base {
 	// Get Animation Class
 	public function get_animation_class( $data, $object ) {
 		$class = '';
+
+		// Disable Animation on Mobile
+		if ( 'overlay' !== $object ) {
+			if ( 'yes' === $data[$object .'_animation_disable_mobile'] && wp_is_mobile() ) {
+				return $class;
+			}
+		}
 
 		// Animation Class
 		if ( 'none' !== $data[ $object .'_animation'] ) {
@@ -9051,10 +9104,12 @@ class Wpr_Woo_Grid extends Widget_Base {
 
 	// Add two new functions for handling cookies
 	public function get_wishlist_from_cookie() {
-		if (isset($_COOKIE['wpr_wishlist'])) {
-			return json_decode(stripslashes($_COOKIE['wpr_wishlist']), true);
-		}
-		return array();
+        if (isset($_COOKIE['wpr_wishlist'])) {
+            return json_decode(stripslashes($_COOKIE['wpr_wishlist']), true);
+        } else if ( isset($_COOKIE['wpr_wishlist_'. get_current_blog_id() .'']) ) {
+            return json_decode(stripslashes($_COOKIE['wpr_wishlist_'. get_current_blog_id() .'']), true);
+        }
+        return array();
 	}
 
 	// Render Wishlist Button
@@ -9136,10 +9191,12 @@ class Wpr_Woo_Grid extends Widget_Base {
 	
 	// Add two new functions for handling cookies
 	public function get_compare_from_cookie() {
-		if (isset($_COOKIE['wpr_compare'])) {
-			return json_decode(stripslashes($_COOKIE['wpr_compare']), true);
-		}
-		return array();
+        if (isset($_COOKIE['wpr_compare'])) {
+            return json_decode(stripslashes($_COOKIE['wpr_compare']), true);
+        } else if ( isset($_COOKIE['wpr_compare_'. get_current_blog_id() .'']) ) {
+            return json_decode(stripslashes($_COOKIE['wpr_compare_'. get_current_blog_id() .'']), true);
+        }
+        return array();
 	}
 
 	// Render Compare Button

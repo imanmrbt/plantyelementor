@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         
         $message_body = [];
     
-		$email_fields = get_option('wpr_email_fields_' . $_POST['wpr_form_id']);
+		$email_fields = trim(get_option('wpr_email_fields_' . $_POST['wpr_form_id']));
 		
 		if ($email_fields === '[all-fields]') {
 			foreach ( $_POST['form_content'] as $key => $value ) {
@@ -180,14 +180,14 @@ if ( ! defined( 'ABSPATH' ) ) {
         if ( $sent ) {
 			wp_send_json_success(array(
 				'action' => 'wpr_form_builder_email',
-				'message' => esc_html__('Message sent successfully'),
+				'message' => esc_html__('Message sent successfully', 'wpr-addons'),
 				'status' => 'success',
 				'details' => json_encode($message_body)
 			));
         } else {
 			wp_send_json_error(array(
 				'action' => 'wpr_form_builder_email',
-				'message' => esc_html__('Message could not be sent'),
+				'message' => esc_html__('Message could not be sent', 'wpr-addons'),
 				'status' => 'error',
 				'details' => json_encode($message_body)
 			));

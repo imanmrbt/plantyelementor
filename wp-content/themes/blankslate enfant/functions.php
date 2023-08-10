@@ -7,18 +7,15 @@ function wpchild_enqueue_styles(){
 }
 
 
-add_filter( 'wp_nav_menu_items','add_admin_link', 10, 2 );
-
-function add_admin_link( $items, $args ) {
-
-    if (is_user_logged_in() && $args->theme_location == 'menu-1') {
-
-        $items .= '<li><a href="'. get_admin_url() .'">Admin</a></li>';
+function hide_admin_link() {
+    if ( ! is_user_logged_in() ) {
+        ?>
+        <style type="text/css">
+            #menu-item-1993 { display: none; }
+        </style>
+        <?php
 
     }
-
-    return $items;
-
 }
-
+add_action( 'wp_head', 'hide_admin_link' );
 ?>

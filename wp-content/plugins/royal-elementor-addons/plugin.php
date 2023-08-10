@@ -167,8 +167,10 @@ class Plugin {
 			add_action( 'admin_enqueue_scripts', [ $this, 'hide_theme_notice' ] );
 		}
 
-		if ( class_exists('WooCommerce') && 'on' === get_option('wpr_override_woo_templates', 'on') ) {
-			require WPR_ADDONS_PATH . 'includes/woocommerce/woocommerce-config.php';
+		if ( class_exists('WooCommerce') ) {
+			 if ( 'on' === get_option('wpr_override_woo_templates', 'on') ) {
+				 require WPR_ADDONS_PATH . 'includes/woocommerce/woocommerce-config.php';
+			 }
 
 			// Add Remove From Wishlist
 			require WPR_ADDONS_PATH . 'classes/woocommerce/wpr-add-remove-from-wishlist.php';
@@ -184,6 +186,10 @@ class Plugin {
 
 			// Add Remove From Compare
 			require WPR_ADDONS_PATH . 'classes/woocommerce/wpr-update-mini-compare.php';
+
+			// Count Wishlist Items
+			require WPR_ADDONS_PATH . 'classes/woocommerce/wpr-count-wishlist-compare-items.php';
+			require WPR_ADDONS_PATH . 'classes/woocommerce/wpr-check-product-in-wc.php';
 		}
 	}
 
@@ -381,13 +387,13 @@ class Plugin {
 		// Posts Timeline
 		wp_register_style( 
 			'wpr-aos-css', 
-			WPR_ADDONS_URL  . 'assets/css/lib/aos/aos'. $this->script_suffix() .'.css',
+			WPR_ADDONS_URL  . 'assets/css/lib/aos/aos.min.css',
 			[]
 		);
 
 		wp_register_style(
 			'wpr-flipster-css',
-			WPR_ADDONS_URL . 'assets/css/lib/flipster/jquery.flipster'. $this->script_suffix() .'.css',
+			WPR_ADDONS_URL . 'assets/css/lib/flipster/jquery.flipster.min.css',
 			[],
 			Plugin::instance()->get_version()
 		);
@@ -456,13 +462,13 @@ class Plugin {
 		
 		wp_enqueue_style( 
 			'wpr-aos-css', 
-			WPR_ADDONS_URL  . 'assets/css/lib/aos/aos'. $this->script_suffix() .'.css',
+			WPR_ADDONS_URL  . 'assets/css/lib/aos/aos.min.css',
 			[]
 		);
 
 		wp_enqueue_style(
 			'wpr-flipster-css',
-			WPR_ADDONS_URL . 'assets/css/lib/flipster/jquery.flipster'. $this->script_suffix() .'.css',
+			WPR_ADDONS_URL . 'assets/css/lib/flipster/jquery.flipster.min.css',
 			[],
 			Plugin::instance()->get_version()
 		);
@@ -507,13 +513,13 @@ class Plugin {
 				'comparePageURL' => get_permalink(get_option('wpr_compare_page')),
 				'wishlistPageID' => get_option('wpr_wishlist_page'),
 				'wishlistPageURL' => get_permalink(get_option('wpr_wishlist_page')),
-				'chooseQuantityText' => esc_html__('Please select the required number of items.'),
+				'chooseQuantityText' => esc_html__('Please select the required number of items.', 'wpr-addons'),
 				'site_key' => get_option('wpr_recaptcha_v3_site_key'),
 				'is_admin' => current_user_can('manage_options'),
-				'input_empty' => esc_html__('Please fill out this field'),
-				'select_empty' => esc_html__('Nothing selected'),
-				'file_empty' => esc_html__('Please upload a file'),
-				'recaptcha_error' => esc_html__('Recaptcha Error')
+				'input_empty' => esc_html__('Please fill out this field', 'wpr-addons'),
+				'select_empty' => esc_html__('Nothing selected', 'wpr-addons'),
+				'file_empty' => esc_html__('Please upload a file', 'wpr-addons'),
+				'recaptcha_error' => esc_html__('Recaptcha Error', 'wpr-addons')
 			]
 		);
 	}
@@ -522,7 +528,7 @@ class Plugin {
 
 		wp_register_script(
 			'wpr-infinite-scroll',
-			WPR_ADDONS_URL . 'assets/js/lib/infinite-scroll/infinite-scroll'. $this->script_suffix() .'.js',
+			WPR_ADDONS_URL . 'assets/js/lib/infinite-scroll/infinite-scroll.min.js',
 			[
 				'jquery',
 			],
@@ -596,7 +602,7 @@ class Plugin {
 
 		wp_register_script(
 			'wpr-lottie-animations',
-			WPR_ADDONS_URL . 'assets/js/lib/lottie/lottie'. $this->script_suffix() .'.js',
+			WPR_ADDONS_URL . 'assets/js/lib/lottie/lottie.min.js',
 			[],
 			'5.8.0',
 			true
@@ -612,7 +618,7 @@ class Plugin {
 		
 		wp_register_script(
 			'wpr-aos-js',
-			 WPR_ADDONS_URL  . 'assets/js/lib/aos/aos'. $this->script_suffix() .'.js',
+			 WPR_ADDONS_URL  . 'assets/js/lib/aos/aos.min.js',
 			 [], 
 			 null, 
 			 true
@@ -620,7 +626,7 @@ class Plugin {
 		
 		wp_register_script(
 			'wpr-charts',
-			WPR_ADDONS_URL . 'assets/js/lib/charts/charts'. $this->script_suffix() .'.js',
+			WPR_ADDONS_URL . 'assets/js/lib/charts/charts.min.js',
 			[],
 			'3.7.0',
 			true
@@ -628,7 +634,7 @@ class Plugin {
 
 		wp_register_script(
 			'wpr-flipster',
-			WPR_ADDONS_URL . 'assets/js/lib/flipster/jquery.flipster'. $this->script_suffix() .'.js',
+			WPR_ADDONS_URL . 'assets/js/lib/flipster/jquery.flipster.min.js',
 			[],
 			'2.0',
 			true
@@ -895,6 +901,12 @@ class Plugin {
 		if ( !wpr_fs()->is_plan( 'expert' ) ) {
 			$expert_widgets = [
 				[
+					'name' => 'wpr-category-grid',
+					'title' => __('Category Grid', 'wpr-addons'),
+					'icon' => 'wpr-icon eicon-gallery-grid',
+					'categories' => '["'. $category .'"]',
+				],
+				[
 					'name' => 'wpr-wishlist-button',
 					'title' => __('Wishlist Button', 'wpr-addons'),
 					'icon' => 'wpr-icon eicon-heart',
@@ -937,15 +949,8 @@ class Plugin {
 
         return $config;
     }
-	
-	public function wpr_enqueue_recaptcha_script() {
-		$site_key = get_option('wpr_recaptcha_v3_site_key');
-		wp_enqueue_script('google-recaptcha', 'https://www.google.com/recaptcha/api.js?render=' . $site_key, array(), null, true);
-	}
 
 	protected function add_actions() {
-		add_action('wp_enqueue_scripts', [$this, 'wpr_enqueue_recaptcha_script']);
-
 		// Register Widgets
 		add_action( 'elementor/init', [ $this, 'elementor_init' ] );
 
@@ -958,7 +963,7 @@ class Plugin {
 		// Register Mega Menu Route
 		$this->register_megamenu_route();
 
-		$this->register_compare_custom_routes();
+		// $this->register_compare_custom_routes();
 
 		// Register Custom Controls
 		add_action( 'elementor/controls/controls_registered', [ $this, 'register_custom_controls' ] );

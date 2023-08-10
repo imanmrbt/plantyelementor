@@ -123,7 +123,6 @@ class Wpr_Form_Builder extends Widget_Base {
 				'label' => esc_html__( 'To', 'wpr-addons' ),
 				'type' => Controls_Manager::TEXT,
 				'default' => get_option( 'admin_email' ),
-				'placeholder' => get_option( 'admin_email' ),
 				'label_block' => true,
 				'title' => esc_html__( 'Separate emails with commas', 'wpr-addons' ),
 				'render_type' => 'none',
@@ -471,7 +470,7 @@ class Wpr_Form_Builder extends Widget_Base {
 			'field_step_notice',
 			[
 				'type' => Controls_Manager::RAW_HTML,
-				'raw' => esc_html__('Step should be a First element of fields group. Ex: Step 1 followed by Field 1, Field 2. Step 2 followed by Field 3, Field 4.'),
+				'raw' => esc_html__('Step should be a First element of fields group. Ex: Step 1 followed by Field 1, Field 2. Step 2 followed by Field 3, Field 4.', 'wpr-addons'),
 				'content_classes' => 'elementor-panel-alert',
 				'condition' => [
 					'field_type' => 'step'
@@ -866,7 +865,7 @@ class Wpr_Form_Builder extends Widget_Base {
 			[
 				'label' => esc_html__( 'Rows', 'wpr-addons' ),
 				'type' => Controls_Manager::NUMBER,
-				'default' => 4,
+				'default' => 7,
 				'conditions' => [
 					'terms' => [
 						[
@@ -1300,6 +1299,18 @@ class Wpr_Form_Builder extends Widget_Base {
 		);
 
 		$this->add_control(
+			'show_placeholders',
+			[
+				'label' => esc_html__( 'Show Placeholders', 'wpr-addons' ),
+				'type' => Controls_Manager::SWITCHER,
+				'label_on' => esc_html__( 'Show', 'wpr-addons' ),
+				'label_off' => esc_html__( 'Hide', 'wpr-addons' ),
+				'return_value' => 'true',
+				'default' => 'true'
+			]
+		);
+
+		$this->add_control(
 			'label_position',
 			[
 				'label' => esc_html__( 'Label Position', 'wpr-addons' ),
@@ -1617,6 +1628,33 @@ class Wpr_Form_Builder extends Widget_Base {
 			]
 		);
 
+		$this->add_responsive_control(
+			'labels_align',
+			[
+				'label' => esc_html__( 'Align Labels', 'wpr-addons' ),
+				'type' => Controls_Manager::CHOOSE,
+				'options' => [
+					'flex-start' => [
+						'title' => esc_html__( 'Left', 'wpr-addons' ),
+						'icon' => 'eicon-text-align-left',
+					],
+					'center' => [
+						'title' => esc_html__( 'Center', 'wpr-addons' ),
+						'icon' => 'eicon-text-align-center',
+					],
+					'flex-end' => [
+						'title' => esc_html__( 'Right', 'wpr-addons' ),
+						'icon' => 'eicon-text-align-right',
+					],
+				],
+				'default' => 'flex-start',
+				'selectors' => [
+					'{{WRAPPER}} .wpr-field-group' => 'justify-content: {{VALUE}}'
+				],
+				'separator' => 'before'
+			]
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -1839,6 +1877,8 @@ class Wpr_Form_Builder extends Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .wpr-field-group:not(.wpr-form-field-type-upload) .wpr-form-field:not(.wpr-select-wrap)' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					'{{WRAPPER}} .wpr-field-group .wpr-select-wrap select' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .wpr-field-group input[type="date"]::before' => 'right: {{RIGHT}}{{UNIT}};',
+					'{{WRAPPER}} .wpr-field-group input[type="time"]::before' => 'right: {{RIGHT}}{{UNIT}};',
 				],
 			]
 		);
@@ -1888,12 +1928,113 @@ class Wpr_Form_Builder extends Widget_Base {
 				],
 				'selectors' => [
 					'{{WRAPPER}} .wpr-form-field-option label' => 'margin-left: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}}.wpr-custom-styles-yes .wpr-form-field-option label:before' => 'margin-right: {{SIZE}}{{UNIT}};',
 				],
 				'separator' => 'before'
 			]
 		);
 
 		$this->end_controls_section();
+
+		// Styles ====================
+		// Section: Checkboxes -------
+		$this->start_controls_section(
+			'section_style_checkbox_radio',
+			[
+				'label' => esc_html__( 'Checkbox & Radio', 'wpr-addons' ),
+				'tab' => Controls_Manager::TAB_STYLE,
+				'show_label' => false,
+			]
+		);
+
+		$this->add_control(
+			'checkbox_radio_custom',
+			[
+				'label' => esc_html__( 'Use Custom Styles', 'wpr-addons' ),
+				'type' => Controls_Manager::SWITCHER,
+				'default' => 'yes',
+				'prefix_class' => 'wpr-custom-styles-'
+			]
+		);
+
+		$this->add_control(
+			'checkbox_radio_static_color',
+			[
+				'label' => esc_html__( 'Static Color', 'wpr-addons' ),
+				'type' => Controls_Manager::COLOR,
+				'default' => '#FFFFFF',
+				'selectors' => [
+					'{{WRAPPER}} .wpr-form-field-type-checkbox .wpr-form-field-option label:before' => 'background-color: {{VALUE}}',
+					'{{WRAPPER}} .wpr-form-field-type-radio .wpr-form-field-option label:before' => 'background-color: {{VALUE}}',
+				],
+				'condition' => [
+					'checkbox_radio_custom' => 'yes'
+				]
+			]
+		);
+
+		$this->add_control(
+			'checkbox_radio_active_color',
+			[
+				'label' => esc_html__( 'Active Color', 'wpr-addons' ),
+				'type' => Controls_Manager::COLOR,
+				'default' => '#605BE5',
+				'selectors' => [
+					'{{WRAPPER}} .wpr-form-field-type-checkbox .wpr-form-field-option label:before' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .wpr-form-field-type-radio .wpr-form-field-option label:before' => 'color: {{VALUE}}',
+				],
+				'condition' => [
+					'checkbox_radio_custom' => 'yes'
+				]
+			]
+		);
+
+		$this->add_control(
+			'checkbox_radio_border_color',
+			[
+				'label' => esc_html__( 'Border Color', 'wpr-addons' ),
+				'type' => Controls_Manager::COLOR,
+				'default' => '#E8E8E8',
+				'selectors' => [
+					'{{WRAPPER}} .wpr-form-field-type-checkbox .wpr-form-field-option label:before' => 'border-color: {{VALUE}}',
+					'{{WRAPPER}} .wpr-form-field-type-radio .wpr-form-field-option label:before' => 'border-color: {{VALUE}}',
+				],
+				'condition' => [
+					'checkbox_radio_custom' => 'yes'
+				]
+			]
+		);
+
+		$this->add_control(
+			'checkbox_radio_size',
+			[
+				'label' => esc_html__( 'Size', 'wpr-addons' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => ['px'],
+				'range' => [
+					'px' => [
+						'min' => 10,
+						'max' => 50,
+					],
+				],				
+				'default' => [
+					'unit' => 'px',
+					'size' => 16,
+				],
+				'selectors' => [
+					'{{WRAPPER}} .wpr-form-field-type-checkbox .wpr-form-field-option label:before' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}}; line-height: {{SIZE}}{{UNIT}}; font-size: calc({{SIZE}}{{UNIT}} / 1.3);',
+					'{{WRAPPER}} .wpr-form-field-type-radio .wpr-form-field-option label:before' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}}; line-height: {{SIZE}}{{UNIT}}; font-size: calc({{SIZE}}{{UNIT}} / 1.3);',
+					'{{WRAPPER}} .wpr-form-field-type-checkbox input' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .wpr-form-field-type-radio input' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}};'
+				],
+				'separator' => 'before',
+				'condition' => [
+					'checkbox_radio_custom' => 'yes'
+				]
+			]
+		);
+
+		$this->end_controls_section(); // End Controls Section
 
 		$this->start_controls_section(
 			'section_button_style',
@@ -3127,7 +3268,8 @@ class Wpr_Form_Builder extends Widget_Base {
 	}
 
 	public function get_attribute_id( $item ) {
-		 $id_suffix = !empty($item['field_id']) ? $item['field_id'] : $item['field_type'];
+		//  $id_suffix = !empty($item['field_id']) ? $item['field_id'] : $item['field_type'];
+		 $id_suffix = !empty($item['field_id']) ? $item['field_id'] : $item['_id'];
 		return 'form-field-' . $id_suffix;
 	}
 
@@ -3143,7 +3285,7 @@ class Wpr_Form_Builder extends Widget_Base {
 			'rows' => $item['rows'],
 		] );
 
-		if ( $item['placeholder'] ) {
+		if ( 'true' == $this->get_settings_for_display()['show_placeholders'] && $item['placeholder'] ) {
 			$this->add_render_attribute( 'textarea' . $item_index, 'placeholder', $item['placeholder'] );
 		}
 
@@ -3264,7 +3406,7 @@ class Wpr_Form_Builder extends Widget_Base {
 					$this->add_required_attribute( $element_id );
 				}
 
-				$html .= '<span class="wpr-form-field-option" data-key="'. $item['field_id'] .'"><input ' . $this->get_render_attribute_string( $element_id ) . '> <label for="' . $html_id . '">'. $option_label .'</label></span>';
+				$html .= '<span class="wpr-form-field-option" data-key="form-field-'. $item['field_id'] .'"><input ' . $this->get_render_attribute_string( $element_id ) . '> <label for="' . $html_id . '">'. $option_label .'</label></span>';
 			}
 			$html .= '</div>';
 		}
@@ -3322,7 +3464,7 @@ class Wpr_Form_Builder extends Widget_Base {
 		$this->add_render_attribute( 'field-group' . $i, 'class', 'elementor-repeater-item-'. esc_attr($item['_id']) );
 
 		// Allow zero as placeholder.
-		if ( ! Utils::is_empty( $item['placeholder'] ) ) {
+		if ( 'true' == $instance['show_placeholders'] && ! Utils::is_empty( $item['placeholder'] ) ) {
 			$this->add_render_attribute( 'input' . $i, 'placeholder', $item['placeholder'] );
 		}
 
@@ -3331,7 +3473,7 @@ class Wpr_Form_Builder extends Widget_Base {
 		}
 
 		if ( ! $instance['show_labels'] ) {
-			$this->add_render_attribute( 'label' . $i, 'class', 'elementor-screen-only' );
+			$this->add_render_attribute( 'label' . $i, 'class', 'wpr-hidden-element' );
 		}
 
 		if ( ! empty( $item['required'] ) ) {
@@ -3348,7 +3490,7 @@ class Wpr_Form_Builder extends Widget_Base {
 		<span <?php echo $this->get_render_attribute_string( 'icon-align' ); ?>>
 			<?php Icons_Manager::render_icon( $settings['selected_button_icon'], [ 'aria-hidden' => 'true' ] );  ?>
 			<?php if ( empty( $instance['button_text'] ) ) : ?>
-				<span class="elementor-screen-only"><?php echo esc_html__( 'Submit', 'wpr-addons' ); ?></span>
+				<span class="wpr-hidden-element"><?php echo esc_html__( 'Submit', 'wpr-addons' ); ?></span>
 			<?php endif; ?>
 		</span>
 	<?php }
@@ -3360,7 +3502,7 @@ class Wpr_Form_Builder extends Widget_Base {
 		// 			echo '<span '. $this->get_render_attribute_string( 'icon-align' ) .'>';
 		// 				if ( empty( $instance['button_text'] ) ) :
 		// 					// remove class if possible
-		// 					echo '<span  class="elementor-screen-only">'. esc_html__( 'Submit', 'wpr-addons' ) .'</span>';
+		// 					echo '<span  class="wpr-hidden-element">'. esc_html__( 'Submit', 'wpr-addons' ) .'</span>';
 		// 				endif;
 		// 			echo '</span>';
 		// 		endif;
@@ -3637,7 +3779,7 @@ class Wpr_Form_Builder extends Widget_Base {
 								echo $this->make_radio_checkbox_field( $item, $item_index, $item['field_type'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 								break;
 							case 'recaptcha-v3':
-								echo '<input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response" />';
+								echo '<input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response" data-site-key="'. get_option('wpr_recaptcha_v3_site_key') .'" />';
 							case 'text':
 							case 'email':
 							case 'url':

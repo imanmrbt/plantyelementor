@@ -114,6 +114,7 @@ class Utilities {
 			'Product Add to Cart' => ['product-add-to-cart', '', '', ''],
 			'Product Tabs' => ['product-tabs', '', '', ''],
 			'Product Excerpt' => ['product-excerpt', '', '', ''],
+			'Product Description' => ['product-description', '', '', ''],
 			'Product Rating' => ['product-rating', '', '', ''],
 			'Product Meta' => ['product-meta', '', '', ''],
 			'Product Sales Badge' => ['product-sales-badge', '', '', ''],
@@ -635,7 +636,7 @@ class Utilities {
 	/**
 	** Get Custom Meta Keys
 	*/
-	public static function get_custom_meta_keys() {
+	public static function get_custom_meta_keys() { // needs ajaxifying
 		$data = [];
 		$options = [];
 		$merged_meta_keys = [];
@@ -772,7 +773,8 @@ class Utilities {
 	*/
 	public static function ajax_mailchimp_subscribe() {
 		// API Key
-        $api_key = isset($_POST['apiKey']) ? sanitize_key($_POST['apiKey']) : '';
+        $api_key = !empty(get_option('wpr_mailchimp_api_key')) && false != get_option('wpr_mailchimp_api_key') ? get_option('wpr_mailchimp_api_key') : ''; // GOGA
+
         $api_key_sufix = explode( '-', $api_key )[1];
 
         // List ID
@@ -1067,12 +1069,14 @@ class Utilities {
 	}
 	
 	// Add two new functions for handling cookies
-	public static function get_wishlist_from_cookie() {
-		if (isset($_COOKIE['wpr_wishlist'])) {
-			return json_decode(stripslashes($_COOKIE['wpr_wishlist']), true);
-		}
-		return array();
-	}
+    public function get_wishlist_from_cookie() {
+        if (isset($_COOKIE['wpr_wishlist'])) {
+            return json_decode(stripslashes($_COOKIE['wpr_wishlist']), true);
+        } else if ( isset($_COOKIE['wpr_wishlist_'. get_current_blog_id() .'']) ) {
+            return json_decode(stripslashes($_COOKIE['wpr_wishlist_'. get_current_blog_id() .'']), true);
+        }
+        return array();
+    }
 
 	// Client IP for form submission
 	public static function get_client_ip() {

@@ -1,9 +1,9 @@
 === Royal Elementor Addons and Templates ===
-Contributors: WP Royal, rubeushagrid13, cyberpinky, elementoraddonswpr, ggedenidze1982
+Contributors: WP Royal, rubeushagrid13, cyberpinky, elementoraddonswpr, ggedenidze1982, wprduke
 Tags: elementor, elementor templates, elementor addons, widgets for elementor, elementor widgets, elementor mega menu, elementor woocommerce builder, theme builder, header footer builder, elementor post grid, elementor product grid, addons for elementor
-Stable tag: 1.3.69
+Stable tag: 1.3.71
 Requires at least: 5.0
-Tested up to: 6.2.2
+Tested up to: 6.3
 Requires PHP: 5.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -46,6 +46,7 @@ Comes with **80+ Elementor addons, 60+ Elementor Templates KIT (Growing Each Wee
 - [**Progress Bar**](https://royal-elementor-addons.com/elementor-progress-bar-widget/?ref=rea-wpo-pp-details-tab)
 - [**Tabs**](https://royal-elementor-addons.com/elementor-tabs-widget/?ref=rea-wpo-pp-details-tab)
 - [**Advanced Text - Fancy Text**](https://royal-elementor-addons.com/elementor-advanced-text-widget/?ref=rea-wpo-pp-details-tab)
+- [**Category Grid**](https://demosites.royal-elementor-addons.com/fashion-v1/?ref=rea-wpo-pp-details-tab#catgridprev)
 - [**Flip Box**](https://royal-elementor-addons.com/elementor-flip-box-widget/?ref=rea-wpo-pp-details-tab) 
 - [**Promo Box**](https://royal-elementor-addons.com/elementor-promo-box-widget/?ref=rea-wpo-pp-details-tab) 
 - [**Before After Slider - Image comparison Slider**](https://royal-elementor-addons.com/elementor-before-after-widget/?ref=rea-wpo-pp-details-tab)
@@ -125,6 +126,7 @@ and other custom branding related settings)
 **Elementor Wocommerce Builder Templates Kits**
 
 - [**Electronic Store**](https://demosites.royal-elementor-addons.com/estore-v1/?ref=rea-wpo-pp-details-tab)
+- [**Auto Parts Store**](https://demosites.royal-elementor-addons.com/woo-auto-parts-v1/?ref=rea-wpo-pp-details-tab)
 - [**Fashion 2**](https://demosites.royal-elementor-addons.com/fashion-v2/?ref=rea-wpo-pp-details-tab)
 - [**Woo Shop**](https://demosites.royal-elementor-addons.com/wooshop-v1/?ref=rea-wpo-pp-details-tab)
 - [**Fashion 1**](https://demosites.royal-elementor-addons.com/fashion-v1/?ref=rea-wpo-pp-details-tab)
@@ -132,6 +134,7 @@ and other custom branding related settings)
 - [**Furniture Store**](https://demosites.royal-elementor-addons.com/furniture-shop-v1/?ref=rea-wpo-pp-details-tab)
 - [**Food Delivery**](https://demosites.royal-elementor-addons.com/woo-food-v1/?ref=rea-wpo-pp-details-tab)
 - [**Ecommerce**](https://demosites.royal-elementor-addons.com/ecommerce-v1/?ref=rea-wpo-pp-details-tab)
+- [**View All Demos**](https://demosites.royal-elementor-addons.com/elementor-templates/?ref=rea-wpo-pp-details-tab)
 
 **Elementor Theme Builder Templates Kits**
 
@@ -143,6 +146,7 @@ and other custom branding related settings)
 - [**Magazine Blog v3**](https://demosites.royal-elementor-addons.com/magazine-blog-v3/?ref=rea-wpo-pp-details-tab)
 - [**Food Blog**](https://demosites.royal-elementor-addons.com/food-blog-v1/?ref=rea-wpo-pp-details-tab)
 - [**Travel Blog**](https://demosites.royal-elementor-addons.com/travel-blog-v1/?ref=rea-wpo-pp-details-tab)
+- [**View All Demos**](https://demosites.royal-elementor-addons.com/elementor-templates/?ref=rea-wpo-pp-details-tab)
 
 **Elementor Templates Kits**
 
@@ -151,8 +155,9 @@ and other custom branding related settings)
 - [**Digital Agency**](https://demosites.royal-elementor-addons.com/digitalagency-v2/?ref=rea-wpo-pp-details-tab)
 - [**Digital Agency**](https://demosites.royal-elementor-addons.com/digitalagency-v3/?ref=rea-wpo-pp-details-tab)
 - [**It Technology 1**](https://demosites.royal-elementor-addons.com/ittech-v1/?ref=rea-wpo-pp-details-tab)
-- [**Construction**](https://demosites.royal-elementor-addons.com/construction-v1/?ref=rea-wpo-pp-details-tab)
-- [**Construction**](https://demosites.royal-elementor-addons.com/construction-v3/?ref=rea-wpo-pp-details-tab)
+- [**Construction v1**](https://demosites.royal-elementor-addons.com/construction-v1/?ref=rea-wpo-pp-details-tab)
+- [**Construction v2**](https://demosites.royal-elementor-addons.com/construction-v2/?ref=rea-wpo-pp-details-tab)
+- [**Construction v3**](https://demosites.royal-elementor-addons.com/construction-v3/?ref=rea-wpo-pp-details-tab)
 - [**Architecture**](https://demosites.royal-elementor-addons.com/architecture-v1/?ref=rea-wpo-pp-details-tab)
 - [**It Technology 2**](https://demosites.royal-elementor-addons.com/ittech-v2/?ref=rea-wpo-pp-details-tab)
 - [**Drone**](https://demosites.royal-elementor-addons.com/drone-v1/?ref=rea-wpo-pp-details-tab)
@@ -180,7 +185,25 @@ and other custom branding related settings)
 - [**Architecture & Interior**](https://demosites.royal-elementor-addons.com/architecture-v2/?ref=rea-wpo-pp-details-tab)
 - [**Fytness & Gym**](https://demosites.royal-elementor-addons.com/fitness-gym-v1/?ref=rea-wpo-pp-details-tab)
 - [**Business Consulting**](https://demosites.royal-elementor-addons.com/business-consulting-v1/?ref=rea-wpo-pp-details-tab)
-- [**Car Repair**](https://demosites.royal-elementor-addons.com/car-repair-v1//?ref=rea-wpo-pp-details-tab)
+- [**Car Repair**](https://demosites.royal-elementor-addons.com/car-repair-v1/?ref=rea-wpo-pp-details-tab)
+- [**Business Landing Page**](https://demosites.royal-elementor-addons.com/landing-page-business-v1/?ref=rea-wpo-pp-details-tab)
+- [**Mobile App Landing Page**](https://demosites.royal-elementor-addons.com/landing-page-mobileapp-v1/?ref=rea-wpo-pp-details-tab)
+- [**Digital Product Landing Page**](https://demosites.royal-elementor-addons.com/landing-page-digital-product-v1/?ref=rea-wpo-pp-details-tab)
+- [**Saas Landing Page**](https://demosites.royal-elementor-addons.com/landing-page-saas-v1/?ref=rea-wpo-pp-details-tab)
+- [**Startup Landing Page**](https://demosites.royal-elementor-addons.com/landing-page-startup-v1/?ref=rea-wpo-pp-details-tab)
+- [**Ebook Landing Page**](https://demosites.royal-elementor-addons.com/landing-page-ebook-v1/?ref=rea-wpo-pp-details-tab)
+- [**Home Care**](https://demosites.royal-elementor-addons.com/home-care-v1/?ref=rea-wpo-pp-details-tab)
+- [**Fintech**](https://demosites.royal-elementor-addons.com/fintech-v1/?ref=rea-wpo-pp-details-tab)
+- [**Portfolio v2**](https://demosites.royal-elementor-addons.com/portfolio-v2/?ref=rea-wpo-pp-details-tab)
+- [**Hotel v1**](https://demosites.royal-elementor-addons.com/hotel-v1/?ref=rea-wpo-pp-details-tab)
+- [**Yoga**](https://demosites.royal-elementor-addons.com/yoga-v1/?ref=rea-wpo-pp-details-tab)
+- [**Digital Seo Marketing Agency**](https://demosites.royal-elementor-addons.com/digital-seo-marketing-agency-v1/?ref=rea-wpo-pp-details-tab)
+- [**Real Estate v2**](https://demosites.royal-elementor-addons.com/realestate-v2/?ref=rea-wpo-pp-details-tab)
+- [**Digital Marketing Agency v3**](https://demosites.royal-elementor-addons.com/digital-marketing-agency-v3/?ref=rea-wpo-pp-details-tab)
+- [**Digital Marketing Agency v2**](https://demosites.royal-elementor-addons.com/digital-marketing-agency-v2/?ref=rea-wpo-pp-details-tab)
+- [**Digital Agency Dark**](https://demosites.royal-elementor-addons.com/digital-agency-dark-v1/?ref=rea-wpo-pp-details-tab)
+- [**Charity**](https://demosites.royal-elementor-addons.com/charity-v1/?ref=rea-wpo-pp-details-tab)
+- [**View All Demos**](https://demosites.royal-elementor-addons.com/elementor-templates/?ref=rea-wpo-pp-details-tab)
 
 **How to Import Template Kit:**
 
@@ -397,6 +420,20 @@ memory_limit 256M or more
 post_max_size 64M
 
 == Changelog ==
+= Royal Elementor Addons v1.3.71 - 2023-07-11 =
+* ADDED: Business Landing Page - Elementor Templates Kit - [**Landing Page Business**](https://demosites.royal-elementor-addons.com/landing-page-business-v1/?ref=rea-wpo-pp-details-tab).
+* ADDED: Digital Product Landing Page - Elementor Templates Kit - [**Landing Page Digital Product**](https://demosites.royal-elementor-addons.com/landing-page-digital-product-v1/?ref=rea-wpo-pp-details-tab).
+* ADDED: Construction v2 Elementor Templates Kit - [**Construction v2**](https://demosites.royal-elementor-addons.com/construction-v2/?ref=rea-wpo-pp-details-tab)
+* ADDED: Youtube, Vimeo and Custom Video Support for Advanced Slider Widget (Pro).
+* ADDED: Category Filter for Ajax Search Widget (Pro). [**Preview**](https://prnt.sc/1pZSsRHIaFjV)
+* ADDED: Category Grid Widget for any type of post types and taxonomies (Expert).
+* ADDED: Sorting by Custom Fields for Advanced Post Grid/Slider/Carousel Widget (Pro).
+* FIXED: Minor Bugs.
+
+= Royal Elementor Addons v1.3.70 - 2023-07-01 =
+* ADDED: Auto Parts Store Elementor Templates Kit - [**Auto Parts Store**](https://demosites.royal-elementor-addons.com/woo-auto-parts-v1/?ref=rea-wpo-pp-details-tab).
+* FIXED: Minor Bugs.
+
 = Royal Elementor Addons v1.3.69 - 2023-06-08 =
 * ADDED: Home Care v1 Elementor Templates Kit - [**Home Care v1**](https://demosites.royal-elementor-addons.com/home-care-v1/?ref=rea-wpo-pp-details-tab).
 * ADDED: Fintech v1 Elementor Templates Kit - [**Fintech v1**](https://demosites.royal-elementor-addons.com/fintech-v1/?ref=rea-wpo-pp-details-tab).

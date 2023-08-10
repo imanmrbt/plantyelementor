@@ -169,13 +169,17 @@ class Wpr_Grid extends Widget_Base {
 					'pro-mf' => esc_html__( 'Last Modified (Pro)', 'wpr-addons'),
 					'pro-d' => esc_html__( 'Post ID (Pro)', 'wpr-addons' ),
 					'pro-ar' => esc_html__( 'Post Author (Pro)', 'wpr-addons' ),
-					'pro-cc' => esc_html__( 'Comment Count (Pro)', 'wpr-addons' )
+					'pro-cc' => esc_html__( 'Comment Count (Pro)', 'wpr-addons' ),
+					'pro-mv' => esc_html__( 'Custom Field (Pro)', 'wpr-addons' )
 				],
 				'condition' => [
 					'query_randomize!' => 'rand',
 				]
 			]
 		);
+	}
+
+	public function add_control_order_posts_by_acf($meta) {
 	}
 
 	public function add_control_query_slides_to_show() {
@@ -818,6 +822,8 @@ class Wpr_Grid extends Widget_Base {
 		);
 
 		$this->add_control_order_posts();
+
+		$this->add_control_order_posts_by_acf( $post_meta_keys[1] );
 
 		// Upgrade to Pro Notice
 		Utilities::upgrade_pro_notice( $this, Controls_Manager::RAW_HTML, 'grid', 'order_posts', ['pro-tl', 'pro-mf', 'pro-d', 'pro-ar', 'pro-cc'] );
@@ -2251,6 +2257,19 @@ class Wpr_Grid extends Widget_Base {
 			]
 		);
 
+		$repeater->add_control(
+			'element_animation_disable_mobile',
+			[
+				'label' => esc_html__( 'Disable on Mobile/Tablet', 'wpr-addons' ),
+				'type' => Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'condition' => [
+					'element_animation!' => 'none',
+					'element_location' => 'over' 
+				],
+			]
+		);
+
 		$repeater->add_responsive_control(
 			'element_show_on',
 			[
@@ -2818,7 +2837,7 @@ class Wpr_Grid extends Widget_Base {
 				'dynamic' => [
 					'active' => true,
 				],
-				'default' => 'All Post',
+				'default' => 'All Posts',
 				'condition' => [
 					'filters_all' => 'yes',
 					'filters_linkable!' => 'yes',
@@ -8258,6 +8277,10 @@ class Wpr_Grid extends Widget_Base {
 			'offset' => $offset
 		];
 
+		if ( $query_order_by == 'meta_value' ) {
+			$args['meta_key'] = $settings['order_posts_by_acf'];
+		}
+
 		// Display Scheduled Posts
 		if ( 'yes' === $settings['display_scheduled_posts'] && wpr_fs()->can_use_premium_code() ) {
 			$args['post_status'] = 'future';
@@ -8292,9 +8315,29 @@ class Wpr_Grid extends Widget_Base {
 		if ( 'current' === $settings[ 'query_source' ] ) {
 			global $wp_query;
 
+			$tax_query = [];
+
 			$args = $wp_query->query_vars;
 			$args['orderby'] = $query_order_by;
 			$args['offset'] = ( $paged - 1 ) * intval(get_option('posts_per_page')) + intval($settings[ 'query_offset' ]);
+			
+			if ( isset($_GET['category']) ) {
+				
+				if ( $_GET['category'] != '0' ) {
+					// Get category from URL
+					$category = sanitize_text_field($_GET['category']);
+				
+					array_push( $tax_query, [
+						'taxonomy' => 'category',
+						'field' => 'id',
+						'terms' => $category
+					] );
+				}
+			}
+
+			if ( !empty($tax_query) ) {
+				$args['tax_query'] = $tax_query;
+			}
 		}
 
 		// Related
@@ -8348,6 +8391,13 @@ class Wpr_Grid extends Widget_Base {
 	// Get Animation Class
 	public function get_animation_class( $data, $object ) {
 		$class = '';
+
+		// Disable Animation on Mobile
+		if ( 'overlay' !== $object ) {
+			if ( 'yes' === $data[$object .'_animation_disable_mobile'] && wp_is_mobile() ) {
+				return $class;
+			}
+		}
 
 		// Animation Class
 		if ( 'none' !== $data[ $object .'_animation'] ) {
@@ -8431,14 +8481,14 @@ class Wpr_Grid extends Widget_Base {
 		if ( has_post_thumbnail() ) {
 			echo '<div class="wpr-grid-image-wrap" data-src="'. esc_url( $src ) .'" data-img-on-hover="'. $settings['secondary_img_on_hover'] .'"  data-src-secondary="'. esc_url( $src2 ) .'">';
 				if ( 'yes' == $settings['grid_lazy_loading'] ) {
-					echo '<img src="'. WPR_ADDONS_ASSETS_URL . 'img/icon-256x256.png" alt="'. esc_attr( $alt ) .'" class="wpr-hidden-image wpr-anim-timing-'. esc_attr($settings[ 'image_effects_animation_timing']) .'">';
+					echo '<img data-no-lazy="1" src="'. WPR_ADDONS_ASSETS_URL . 'img/icon-256x256.png" alt="'. esc_attr( $alt ) .'" class="wpr-hidden-image wpr-anim-timing-'. esc_attr($settings[ 'image_effects_animation_timing']) .'">';
 					if ( 'yes' == $settings['secondary_img_on_hover'] ) {
-						echo '<img src="'. esc_url( $src2 ) . '" alt="'. esc_attr( $alt ) .'" class="wpr-hidden-img wpr-anim-timing-'. esc_attr($settings[ 'image_effects_animation_timing']) .'">';
+						echo '<img data-no-lazy="1" src="'. esc_url( $src2 ) . '" alt="'. esc_attr( $alt ) .'" class="wpr-hidden-img wpr-anim-timing-'. esc_attr($settings[ 'image_effects_animation_timing']) .'">';
 					}
 				} else {
-					echo '<img src="'. esc_url( $src ) . '" alt="'. esc_attr( $alt ) .'" class="wpr-anim-timing-'. esc_attr($settings[ 'image_effects_animation_timing']) .'">';
+					echo '<img data-no-lazy="1" src="'. esc_url( $src ) . '" alt="'. esc_attr( $alt ) .'" class="wpr-anim-timing-'. esc_attr($settings[ 'image_effects_animation_timing']) .'">';
 					if ( 'yes' == $settings['secondary_img_on_hover'] ) {
-						echo '<img src="'. esc_url( $src2 ) . '" alt="'. esc_attr( $alt ) .'" class="wpr-hidden-img wpr-anim-timing-'. esc_attr($settings[ 'image_effects_animation_timing']) .'">';
+						echo '<img data-no-lazy="1" src="'. esc_url( $src2 ) . '" alt="'. esc_attr( $alt ) .'" class="wpr-hidden-img wpr-anim-timing-'. esc_attr($settings[ 'image_effects_animation_timing']) .'">';
 					}
 				}
 			echo '</div>';
@@ -8451,7 +8501,7 @@ class Wpr_Grid extends Widget_Base {
 
 			if ( wpr_fs()->can_use_premium_code() ) {
 				if ( '' !== $settings['overlay_image']['url'] ) {
-					echo '<img src="'. esc_url( $settings['overlay_image']['url'] ) .'">';
+					echo '<img data-no-lazy="1" src="'. esc_url( $settings['overlay_image']['url'] ) .'">';
 				}
 			}
 

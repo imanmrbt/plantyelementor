@@ -17,6 +17,7 @@
 				'wpr-media-grid.default' : WprElements.widgetGrid,
 				'wpr-woo-grid.default' : WprElements.widgetGrid,
 				'wpr-woo-category-grid-pro.default' : WprElements.widgetGrid,
+				'wpr-category-grid-pro.default' : WprElements.widgetGrid,
 				'wpr-featured-media.default' : WprElements.widgetFeaturedMedia,
 				'wpr-countdown.default' : WprElements.widgetCountDown,
 				'wpr-google-maps.default' : WprElements.widgetGoogleMaps,
@@ -153,8 +154,16 @@
 				    stickySectionExists = $scope.hasClass('wpr-sticky-section-yes') || $scope.find('.wpr-sticky-section-yes-editor') ? true : false,
 				    positionStyle, 
                     adminBarHeight,
-				    stickyHeaderFooter = $scope.closest('div[data-elementor-type="wp-post"]').length ? $scope.closest('div[data-elementor-type="wp-post"]') : '',
+				    stickyHeaderFooter = '',
 					headerFooterZIndex = !WprElements.editorCheck() ? $scope.attr('data-wpr-z-index') : $scope.find('.wpr-sticky-section-yes-editor').attr('data-wpr-z-index');
+
+				if ( $scope.closest('div[data-elementor-type="wp-post"]').length > 0 ) {
+					stickyHeaderFooter = $scope.closest('div[data-elementor-type="wp-post"]');
+				} else if ( $scope.closest('div[data-elementor-type="header"]').length > 0 ) {
+					stickyHeaderFooter = $scope.closest('div[data-elementor-type="header"]');
+				} else if ( $scope.closest('div[data-elementor-type="footer"]').length > 0 ) {
+					stickyHeaderFooter = $scope.closest('div[data-elementor-type="footer"]');
+				}
 
 			    if ( !$scope.find('.wpr-sticky-section-yes-editor').length) {
 			        positionType = $scope.attr('data-wpr-position-type');
@@ -1262,7 +1271,7 @@
 						});
 
 						// Loading
-						pagination.find( '.wpr-pagination-loading' ).hide(); 
+						pagination.find( '.wpr-pagination-loading' ).hide();
 
 						if ( settings.pagination_max_pages - 1 !== pagesLoaded ) {
 							if ( 'load-more' === settings.pagination_type ) {
@@ -1456,10 +1465,12 @@
 				}
 			}
 			
+			checkWishlistAndCompare();
 			addRemoveCompare();
 			addRemoveWishlist();
 	
 			var mutationObserver = new MutationObserver(function(mutations) {
+				// checkWishlistAndCompare();
 				addRemoveCompare();
 				addRemoveWishlist();
 			});
@@ -1751,7 +1762,7 @@
 			}
 
 			// Init Lightbox
-			if ( !$scope.hasClass('elementor-widget-wpr-woo-category-grid-pro') ) {
+			if ( !$scope.hasClass('elementor-widget-wpr-woo-category-grid-pro') && !$scope.hasClass('elementor-widget-wpr-category-grid-pro') ) {
 				lightboxPopup( settings );
 			}
 
@@ -2351,7 +2362,7 @@
 				}
 
 				// Set a Default Filter
-				if ( !$scope.hasClass('elementor-widget-wpr-woo-category-grid-pro') ) {
+				if ( !$scope.hasClass('elementor-widget-wpr-woo-category-grid-pro') && !$scope.hasClass('elementor-widget-wpr-category-grid-pro') ) {
 					if ( '' !== settings.filters_default_filter ) {
 						setTimeout(function() {
 							$scope.find( '.wpr-grid-filters' ).find('span[data-filter*="-'+ settings.filters_default_filter +'"]')[0].click();
@@ -2441,6 +2452,131 @@
 					iGrid.lightGallery( settings.lightbox );
 				});
 
+			}
+
+			// function checkWishlistAndCompare() {
+			// 	if ( iGrid.find('.wpr-wishlist-add').length ) {
+			// 		iGrid.find('.wpr-wishlist-add').each(function() {
+			// 			var wishlistBtn = $(this);
+			// 			$.ajax({
+			// 				url: WprConfig.ajaxurl,
+			// 				type: 'POST',
+			// 				data: {
+			// 					action: 'check_product_in_wishlist',
+			// 					product_id: wishlistBtn.data('product-id')
+			// 				},
+			// 				success: function(response) {
+			// 					if ( true == response ) {
+			// 						if ( !wishlistBtn.hasClass('wpr-button-hidden') ) {
+			// 							wishlistBtn.addClass('wpr-button-hidden');
+			// 						}
+
+			// 						if ( wishlistBtn.next().hasClass('wpr-button-hidden') ) {
+			// 							wishlistBtn.next().removeClass('wpr-button-hidden');
+			// 						}
+			// 					}
+			// 				},
+			// 				error: function(error) {
+			// 					console.log(error);
+			// 				}
+			// 			});
+			// 		});
+			// 	}
+
+			// 	if ( iGrid.find('.wpr-compare-add').length ) {
+			// 		iGrid.find('.wpr-compare-add').each(function() {
+			// 			var compareBtn = $(this);
+			// 			$.ajax({
+			// 				url: WprConfig.ajaxurl,
+			// 				type: 'POST',
+			// 				data: {
+			// 					action: 'check_product_in_compare',
+			// 					product_id: compareBtn.data('product-id')
+			// 				},
+			// 				success: function(response) {
+			// 					if ( true == response ) {
+			// 						if ( !compareBtn.hasClass('wpr-button-hidden') ) {
+			// 							compareBtn.addClass('wpr-button-hidden');
+			// 						}
+
+			// 						if ( compareBtn.next().hasClass('wpr-button-hidden') ) {
+			// 							compareBtn.next().removeClass('wpr-button-hidden');
+			// 						}
+			// 					}
+			// 				},
+			// 				error: function(error) {
+			// 					console.log(error);
+			// 				}
+			// 			});
+			// 		});
+			// 	}
+			// }
+
+			function checkWishlistAndCompare() {
+				var wishlistArray;
+				
+				if ( iGrid.find('.wpr-wishlist-add').length ) {
+
+					$.ajax({
+							url: WprConfig.ajaxurl,
+							type: 'POST',
+							data: {
+								action: 'check_product_in_wishlist_grid',
+							},
+							success: function(response) {
+									wishlistArray = response;
+							}
+					});
+					
+					
+					iGrid.find('.wpr-wishlist-add').each(function() {
+						var wishlistBtn = $(this);
+						
+						if ( $.inArray(wishlistBtn.data('product-id'), wishlistArray) !== -1 ) {
+							if ( !wishlistBtn.hasClass('wpr-button-hidden') ) {
+								wishlistBtn.addClass('wpr-button-hidden');
+							}
+
+							if ( wishlistBtn.next().hasClass('wpr-button-hidden') ) {
+								wishlistBtn.next().removeClass('wpr-button-hidden');
+							}
+						}
+					});
+				}
+
+				if ( iGrid.find('.wpr-compare-add').length > 0 ) {
+					var compareArray = [];
+					
+					$.ajax({
+							url: WprConfig.ajaxurl,
+							type: 'POST',
+							data: {
+								action: 'check_product_in_compare_grid',
+							},
+							success: function(response) {
+								compareArray = response;
+							},
+							error: function(error) {
+								console.log(error);
+							}
+					});
+				
+					
+					iGrid.find('.wpr-compare-add').each(function() {
+						var compareBtn = $(this);
+						
+						if ( $.inArray(compareBtn.data('product-id'), compareArray) !== -1 ) {
+							if ( !compareBtn.hasClass('wpr-button-hidden') ) {
+								compareBtn.addClass('wpr-button-hidden');
+							}
+
+							if ( compareBtn.next().hasClass('wpr-button-hidden') ) {
+								compareBtn.next().removeClass('wpr-button-hidden');
+							}
+						}
+					});
+					
+				}
 			}
 
 			function addRemoveCompare() {
@@ -2654,7 +2790,7 @@
 						});
 					});
 	
-					$scope.find('.wpr-wishlist-remove').click(function(e) {
+					$scope.find('.wpr-wishlist-remove').on('click', function(e) {
 						e.preventDefault();
 						var product_id = $(this).data('product-id');
 
@@ -3638,7 +3774,6 @@
 					data: {
 						action: 'mailchimp_subscribe',
 						fields: $(this).serialize(),
-						apiKey: mailchimpForm.data( 'api-key' ),
 						listId: mailchimpForm.data( 'list-id' )
 					},
 					success: function(data) {
@@ -3666,7 +3801,8 @@
 
 		widgetAdvancedSlider: function( $scope ) {
 			var $advancedSlider = $scope.find( '.wpr-advanced-slider' ),
-			sliderData = $advancedSlider.data('slick');
+			sliderData = $advancedSlider.data('slick'),
+			videoBtnSize = $advancedSlider.data('video-btn-size');
 			
 			// customPaging: function(slider, i) { 
 			// 	return '<span class="wpr-slider-dot" style="background-image:url('+ $(slider.$slides[i]).find('.wpr-slider-item-bg').css('background-image').replace('url(','').replace(')','').replace(/\"/gi, "") +')"></span>';
@@ -3753,41 +3889,114 @@
 				],
 			});
 
+			$(document).ready(function() {
+				var maxHeight = -1;
+				// $scope.find('.slick-slide').each(function() {
+				// if ($(this).height() > maxHeight) {
+				// 	maxHeight = $(this).height();
+				// }
+				// });
+				// $scope.find('.slick-slide').each(function() {
+				// if ($(this).height() < maxHeight) {
+				// 	console.log(Math.ceil((maxHeight-$(this).height())/2) + 'px 0');
+				// 	$(this).css('margin', Math.ceil((maxHeight-$(this).height())/2) + 'px 0');
+				// 	// $(this).css('transform', 'translateY(-50%)');
+				// }
+				// });
+
+				// GOGA - needs condition check if there are any images
+				if ( $scope.find('.wpr-slider-img').length !== 0 ) {
+					$scope.find('.wpr-advanced-slider').css('height', $scope.find('.slick-current').outerHeight());
+				
+					$scope.find('.wpr-slider-arrow').on('click', function() {
+						console.log('works resize');
+						$scope.find('.wpr-advanced-slider').css('height', $scope.find('.slick-current').outerHeight());
+					});
+		
+					$(window).smartresize(function() {
+						$scope.find('.wpr-advanced-slider').css('height', $scope.find('.slick-current').outerHeight());
+					});
+				}
+			});
+			
 			function sliderVideoSize(){
 				  
-				var sliderWidth = $advancedSlider.find('.wpr-slider-item').outerWidth(),
-					sliderHeight = $advancedSlider.find('.wpr-slider-item').outerHeight(),
-					sliderRatio = sliderWidth / sliderHeight,
-					iframeRatio = (16/9),
-					iframeHeight,
-					iframeWidth,
-					iframeTopDistance = 0,
-					iframeLeftDistance = 0;
+				// var sliderWidth = $advancedSlider.find('.wpr-slider-item').outerWidth(),
+				// 	sliderHeight = $advancedSlider.find('.wpr-slider-item').outerHeight(),
+				// 	sliderRatio = sliderWidth / sliderHeight,
+				// 	iframeRatio = (16/9),
+				// 	iframeHeight,
+				// 	iframeWidth,
+				// 	iframeTopDistance = 0,
+				// 	iframeLeftDistance = 0;
 
-				if ( sliderRatio > iframeRatio ) {
-					iframeWidth = sliderWidth;
-					iframeHeight = iframeWidth / iframeRatio;
-					iframeTopDistance = '-'+ ( iframeHeight - sliderHeight ) / 2 +'px';
-				} else {
-					iframeHeight = sliderHeight;
-					iframeWidth = iframeHeight * iframeRatio;
-					iframeLeftDistance = '-'+ ( iframeWidth - sliderWidth ) / 2 +'px';
-				}
+				// if ( sliderRatio > iframeRatio ) {
+				// 	iframeWidth = sliderWidth;
+				// 	iframeHeight = iframeWidth / iframeRatio;
+				// 	iframeTopDistance = '-'+ ( iframeHeight - sliderHeight ) / 2 +'px';
+				// } else {
+				// 	iframeHeight = sliderHeight;
+				// 	iframeWidth = iframeHeight * iframeRatio;
+				// 	iframeLeftDistance = '-'+ ( iframeWidth - sliderWidth ) / 2 +'px';
+				// }
 
-				$advancedSlider.find('iframe').css({
-					'width': iframeWidth +'px',
-					'height': iframeHeight +'px',
-					'max-width': 'none',
-					'position': 'absolute',
-					'left': iframeLeftDistance +'',
-					'top': iframeTopDistance +'',
-					'display': 'block',
-					'text-align': 'inherit',
-					'line-height':'0px',
-					'border-width': '0px',
-					'margin': '0px',
-					'padding': '0px',
+				// $advancedSlider.find('iframe').css({
+				// 	'display': 'block',
+				// 	'width': iframeWidth +'px',
+				// 	'height': iframeHeight +'px',
+				// 	'max-width': 'none',
+				// 	'position': 'absolute',
+				// 	'left': iframeLeftDistance +'',
+				// 	'top': iframeTopDistance +'',
+				// 	'text-align': 'inherit',
+				// 	'line-height':'0px',
+				// 	'border-width': '0px',
+				// 	'margin': '0px',
+				// 	'padding': '0px',
+				// });
+				
+				$advancedSlider.find('iframe').attr('width', $scope.find('.wpr-slider-item').width());
+				$advancedSlider.find('iframe').attr('height', $scope.find('.wpr-slider-item').height());
+
+				var viewportWidth = $(window).outerWidth();
+
+				var MobileResp = +elementorFrontend.config.responsive.breakpoints.mobile.value;
+				var MobileExtraResp = +elementorFrontend.config.responsive.breakpoints.mobile_extra.value;
+				var TabletResp = +elementorFrontend.config.responsive.breakpoints.tablet.value;
+				var TabletExtraResp = +elementorFrontend.config.responsive.breakpoints.tablet_extra.value;
+				var LaptopResp = +elementorFrontend.config.responsive.breakpoints.laptop.value;
+				var wideScreenResp = +elementorFrontend.config.responsive.breakpoints.widescreen.value;
+
+				var activeBreakpoints = elementorFrontend.config.responsive.activeBreakpoints;
+
+				[...$scope[0].classList].forEach(className => {
+					if (className.startsWith('wpr-slider-video-icon-size-')) {
+						$scope[0].classList.remove(className);
+					}
 				});
+
+				// Mobile
+				if ( MobileResp >= viewportWidth && activeBreakpoints.mobile != null ) {
+					$scope.addClass('wpr-slider-video-icon-size-'+videoBtnSize.mobile);
+				// Mobile Extra
+				} else if ( MobileExtraResp >= viewportWidth && activeBreakpoints.mobile_extra != null ) {
+					$scope.addClass('wpr-slider-video-icon-size-'+videoBtnSize.mobile_extra);
+				// Tablet
+				} else if ( TabletResp >= viewportWidth && activeBreakpoints.tablet != null ) {
+					$scope.addClass('wpr-slider-video-icon-size-'+videoBtnSize.tablet);
+				// Tablet Extra
+				} else if ( TabletExtraResp >= viewportWidth && activeBreakpoints.tablet_extra != null ) {
+					$scope.addClass('wpr-slider-video-icon-size-'+videoBtnSize.tablet_extra);
+				// Laptop
+				} else if ( LaptopResp >= viewportWidth && activeBreakpoints.laptop != null ) {
+					$scope.addClass('wpr-slider-video-icon-size-'+videoBtnSize.laptop);
+				// Desktop
+				} else if ( wideScreenResp > viewportWidth ) {
+					$scope.addClass('wpr-slider-video-icon-size-'+videoBtnSize.desktop);
+				}  else {
+					$scope.addClass('wpr-slider-video-icon-size-'+videoBtnSize.widescreen);
+				}
+				// wpr-slider-video-icon-size-
 			}
 
 			$(window).on('load resize', function(){
@@ -3798,26 +4007,43 @@
 				// Handler when all assets (including images) are loaded
 				if ( $scope.find('.wpr-advanced-slider').length ) {
 					$scope.find('.wpr-advanced-slider').css('opacity', 1);
+					autoplayVideo();
 				}
 			});
 
 			function autoplayVideo() {
-				$advancedSlider.find('.slick-active').each(function() {
-					var videoSrc = $(this).attr('data-video-src'),
-						videoAutoplay = $(this).attr('data-video-autoplay');
+				$advancedSlider.find('.slick-current').each(function() {
+
+					var videoSrc = $(this).find('.wpr-slider-item').attr('data-video-src'),
+					videoAutoplay = $(this).find('.wpr-slider-item').attr('data-video-autoplay');
 					
 					if ( $(this).find( '.wpr-slider-video' ).length !== 1 && videoAutoplay === 'yes' ) {
-						if ( sliderColumnsDesktop == 1 ) {
-							$(this).find('.wpr-cv-inner').prepend('<div class="wpr-slider-video"><iframe src="'+ videoSrc +'" width="100%" height="100%"  frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>');  
+						if ( videoSrc.includes('vimeo') || videoSrc.includes('youtube') ) {
+							if ( sliderColumnsDesktop == 1 ) {
+								// $(this).find('.wpr-cv-inner').prepend('<div class="wpr-slider-video"><iframe src="'+ videoSrc +'" width="100%" height="100%"  frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>');
+								$(this).find('.wpr-cv-inner').prepend('<div class="wpr-slider-video"><iframe src="'+ videoSrc +'"  frameborder="0" allow="autoplay" allowfullscreen></iframe></div>');
+							} else {
+								$(this).find('.wpr-cv-container').prepend('<div class="wpr-slider-video"><iframe src="'+ videoSrc +'" width="100%" height="100%"  frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>'); 
+							}
+							sliderVideoSize();
 						} else {
-							$(this).find('.wpr-cv-container').prepend('<div class="wpr-slider-video"><iframe src="'+ videoSrc +'" width="100%" height="100%"  frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>');  
+							var videoMute = $(this).find('.wpr-slider-item').attr('data-video-mute');
+							var videoControls = $(this).find('.wpr-slider-item').attr('data-video-controls');
+							var videoLoop = $(this).find('.wpr-slider-item').attr('data-video-loop');
+
+							$(this).find('.wpr-cv-inner').prepend('<div class="wpr-slider-video wpr-custom-video"><video autoplay '+ videoLoop + ' ' + videoMute + ' ' + videoControls + ' ' +  'src="'+ videoSrc +'" width="100%" height="100%"></video></div>');
+							
+							$advancedSlider.find('video').attr('width', $scope.find('.wpr-slider-item').width());
+							$advancedSlider.find('video').attr('height', $scope.find('.wpr-slider-item').height());
 						}
-						sliderVideoSize();
+
+						// GOGA - remove condition if not necessary
+						if ( $(this).find('.wpr-slider-content') ) {
+							$(this).find('.wpr-slider-content').fadeOut(300);
+						}
 					}
 				});
 			}
-
-			autoplayVideo();
 
 			function slideAnimationOff() {
 				if ( sliderColumnsDesktop == 1 ) {
@@ -3827,6 +4053,8 @@
 
 			function slideAnimationOn() {
 				$advancedSlider.find('.slick-active').find('.wpr-slider-content').fadeIn(0);
+				$advancedSlider.find('.slick-cloned').find('.wpr-slider-content').fadeIn(0);
+				$advancedSlider.find('.slick-current').find('.wpr-slider-content').fadeIn(0);
 				if ( sliderColumnsDesktop == 1 ) {
 					$advancedSlider.find('.slick-active').find('.wpr-slider-animation').addClass( 'wpr-animation-enter' );
 				}
@@ -3834,23 +4062,51 @@
 			
 			slideAnimationOn();
 
-			$advancedSlider.find('.wpr-slider-video-btn').on( 'click', function() {
+			$advancedSlider.on( 'click', '.wpr-slider-video-btn', function() {
 
-				var currentSlide = $(this).closest('.slick-active'),
-					videoSrc = currentSlide.attr('data-video-src');
+				var currentSlide = $(this).closest('.slick-slide'),
+					videoSrc = currentSlide.find('.wpr-slider-item').attr('data-video-src');
 
-				if ( currentSlide.find( '.wpr-slider-video' ).length !== 1 ) {
-					currentSlide.find('.wpr-cv-container').prepend('<div class="wpr-slider-video"><iframe src="'+ videoSrc +'" width="100%" height="100%"  frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>');  
-					sliderVideoSize();
-					currentSlide.find('.wpr-slider-content').fadeOut(300); 
+					console.log(videoSrc);
+			
+				console.log(currentSlide, videoSrc);
+			
+				var allowFullScreen = '';
+			
+				if ( videoSrc.includes('youtube') ) {
+					videoSrc += "&autoplay=1"; // Tell YouTube to autoplay
+					allowFullScreen = 'allowfullscreen="allowfullscreen"';
+				} else if ( videoSrc.includes('vimeo') ) {
+					allowFullScreen = 'allowfullscreen';
+				} else {
+					var videoMute = currentSlide.find('.wpr-slider-item').attr('data-video-mute');
+					var videoControls = currentSlide.find('.wpr-slider-item').attr('data-video-controls');
+					var videoLoop = currentSlide.find('.wpr-slider-item').attr('data-video-loop');
+					
+					if ( currentSlide.find( '.wpr-slider-video' ).length !== 1 ) {
+						currentSlide.find('.wpr-cv-container').prepend('<div class="wpr-slider-video wpr-custom-video"><video '+ videoLoop + ' ' + videoMute + ' ' + videoControls + ' ' + 'src="'+ videoSrc +'" width="100%" height="100%"></video></div>');
+
+						$advancedSlider.find('video').attr('width', $scope.find('.wpr-slider-item').width());
+						$advancedSlider.find('video').attr('height', $scope.find('.wpr-slider-item').height());
+
+						currentSlide.find('.wpr-slider-content').fadeOut(300);
+
+						currentSlide.find('video')[0].play();
+					}
+					return;
 				}
-			   
+			
+				if ( currentSlide.find( '.wpr-slider-video' ).length !== 1 ) {
+					// currentSlide.find('.wpr-cv-container').prepend('<div class="wpr-slider-video"><iframe src="'+ videoSrc +'" width="100%" height="100%"  frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture;"></iframe></div>');
+					currentSlide.find('.wpr-cv-container').prepend('<div class="wpr-slider-video"><iframe src="'+ videoSrc +'" width="100%" height="100%"  frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture;"'+ allowFullScreen +'></iframe></div>');
+
+					sliderVideoSize();
+					currentSlide.find('.wpr-slider-content').fadeOut(300);
+				}
+			
 			});
 
-			$scope.find('.slick-current').addClass('wpr-slick-visible');
-			$scope.find('.slick-current').nextAll().slice(0, sliderColumnsDesktop - 1).addClass('wpr-slick-visible');
-			
-			$advancedSlider.on({
+			$advancedSlider.on( {
 				beforeChange: function() {
 					$advancedSlider.find('.wpr-slider-item').not('.slick-active').find('.wpr-slider-video').remove();
 					$advancedSlider.find('.wpr-animation-enter').find('.wpr-slider-content').fadeOut(300);
@@ -3862,6 +4118,7 @@
 					$scope.find('.slick-slide').removeClass('wpr-slick-visible');
 					$scope.find('.slick-current').addClass('wpr-slick-visible');
 					$scope.find('.slick-current').nextAll().slice(0, sliderColumnsDesktop - 1).addClass('wpr-slick-visible');
+					$scope.find('.wpr-advanced-slider').css('height', $scope.find('.slick-current').outerHeight());
 				}
 			});
 
@@ -4022,6 +4279,29 @@
 					$scope.removeClass( 'wpr-search-form-input-focus' );
 				}
 			} );
+            
+            if ( $scope.find('.wpr-category-select').length > 0 ) {
+                // Set the selected value on page load
+                $(document).ready(function() {
+                    var wprSelectedCategory = localStorage.getItem('wprSelectedCategory');
+                    if (wprSelectedCategory) {
+                        $scope.find('.wpr-category-select').val(wprSelectedCategory);
+                    }
+                });
+
+                $scope.find('.wpr-category-select').on('change', function(e) {
+                    
+                    var selectedValue = $(this).val();
+                    localStorage.setItem('wprSelectedCategory', selectedValue);
+
+			        if ($scope.find('.wpr-search-form-input').attr('ajax-search') === 'yes') {
+                        postsOffset = 0;
+                        $scope.find('.wpr-data-fetch').hide();
+                        $scope.find('.wpr-data-fetch ul').html('');
+                        ajaxSearchCall($scope.find('.wpr-search-form-input'), postsOffset, e);
+                    }
+                });
+            }
 
 			// if ( $scope.find('.wpr-search-input-hidden') ) {
 			// 	$scope.find('.wpr-search-form-submit').on('click', function(e) {
@@ -4052,6 +4332,8 @@
 				if (searchTimeout != null) {
 					clearTimeout(searchTimeout);
 				}
+				var optionPostType = ($scope.find('.wpr-category-select').length > 0 && $scope.find('.wpr-category-select').find('option:selected').data('post-type'));
+
 				searchTimeout = setTimeout(() => {
 					var thisValue = thisObject.val();
 					$.ajax({
@@ -4062,12 +4344,16 @@
 							nonce: WprConfig.nonce,
 							wpr_keyword: $scope.find('.wpr-search-form-input').val(),
 							wpr_query_type: $scope.find('.wpr-search-form-input').attr('wpr-query-type'),
+							wpr_option_post_type: optionPostType ? $scope.find('.wpr-category-select').find('option:selected').data('post-type') : '',
+							wpr_category: $scope.find('.wpr-category-select').length > 0 ? $scope.find('.wpr-category-select').val() : '',
 							wpr_number_of_results: $scope.find('.wpr-search-form-input').attr('number-of-results'),
 							wpr_search_results_offset: postsOffset,
+							wpr_show_description: $scope.find('.wpr-search-form-input').attr('show-description'),
 							wpr_number_of_words: $scope.find('.wpr-search-form-input').attr('number-of-words'),
 							wpr_show_ajax_thumbnail: $scope.find('.wpr-search-form-input').attr('show-ajax-thumbnails'),
 							wpr_show_view_result_btn: $scope.find('.wpr-search-form-input').attr('show-view-result-btn'),
 							wpr_view_result_text: $scope.find('.wpr-search-form-input').attr('view-result-text'),
+							wpr_no_results: $scope.find('.wpr-search-form-input').attr('no-results'),
 							wpr_exclude_without_thumb: $scope.find('.wpr-search-form-input').attr('exclude-without-thumb'),
 							wpr_ajax_search_link_target: $scope.find('.wpr-search-form-input').attr('link-target'),
 							// wpr_ajax_search_img_size: $scope.find('.wpr-search-form-input').attr('ajax-search-img-size')
@@ -4220,8 +4506,6 @@
 						}
 					}
 				});
-
-				
 
 				var mutationObserver = new MutationObserver(function(mutations) {
 					$scope.find('.wpr-data-fetch li').on('click', function() {
@@ -5947,6 +6231,8 @@
 
 			if ($scope.find('.wpr-twitter-feed').attr( 'data-settings' )) {
 				var settings = JSON.parse( $scope.find('.wpr-twitter-feed').attr( 'data-settings' ) );
+			} else {
+				return;
 			}
 
 			let twitterFeed = $scope.find('.wpr-twitter-feed');
@@ -6950,7 +7236,7 @@
 				});
 			})
 		}, // end widgetFeatureList
-
+		
 		widgetAdvancedAccordion: function($scope) {
             var acc = $scope.find('.wpr-acc-button');
             var accItemWrap = $scope.find('.wpr-accordion-item-wrap');
@@ -7476,9 +7762,80 @@
 
 		widgetWishlist: function($scope) {
 
-			$scope.find('.wpr-wishlist-remove').click(function(e) {
+			$.ajax({
+				url: WprConfig.ajaxurl,
+				type: 'POST',
+				data: {
+					action: 'count_wishlist_items',
+					element_addcart_simple_txt: $scope.find('.wpr-wishlist-products').attr('element_addcart_simple_txt'),
+					element_addcart_grouped_txt: $scope.find('.wpr-wishlist-products').attr('element_addcart_grouped_txt'),
+					element_addcart_variable_txt: $scope.find('.wpr-wishlist-products').attr('element_addcart_variable_txt')
+				},
+				success: function(response) { 
+					// Get all elements with the class 'wpr-wishlist-product' and their product IDs
+					var productElements = $scope.find('.wpr-wishlist-product');
+					var productIds = productElements.map(function() {
+						return $(this).data('product-id');
+					}).get();
+					
+					// Filter out the items in the response that match the product IDs
+					var newWishlistItems = response.wishlist_items.filter(function(item) {
+						return !productIds.includes(item.product_id);
+					});
+
+					// Convert the wishlist_items to an array of product_ids for easier searching
+					var wishlistProductIds = response.wishlist_items.map(function(item) {
+						return item.product_id;
+					});
+
+					productElements.each(function() {
+						var productId = $(this).data('product-id');
+					
+						// If the product ID is not in the wishlistProductIds array, remove the element
+						if (!wishlistProductIds.includes(productId)) {
+						$(this).remove();
+						}
+					});
+
+					newWishlistItems.forEach(function(item) {
+						var html = '<tr class="wpr-wishlist-product" data-product-id="' + item.product_id + '">';
+							html += '<td><span class="wpr-wishlist-remove" data-product-id="' + item.product_id + '"></span></td>';
+							html += '<td><a class="wpr-wishlist-img-wrap" href="' + item.product_url + '">' + item.product_image + '</a></td>';
+							html += '<td><a class="wpr-wishlist-product-name" href="' + item.product_url + '">' + item.product_title + '</a></td>';
+							html += '<td><div class="wpr-wishlist-product-price">' + item.product_price + '</div></td>';
+							html += '<td><div class="wpr-wishlist-product-status">' + item.product_stock + '</div></td>';
+							html += '<td><div class="wpr-wishlist-product-atc">' + item.product_atc + '</div></td>';
+						html += '</tr>';
+						$scope.find('.wpr-wishlist-products tbody').append(html);
+					});
+
+					if ( 0 < +response.wishlist_count ) {
+						if ( $scope.find('.wpr-wishlist-products').hasClass('wpr-wishlist-empty-hidden') ) {
+							$scope.find('.wpr-wishlist-products').removeClass('wpr-wishlist-empty-hidden');
+						}
+
+						if ( !$scope.find('.wpr-wishlist-empty').hasClass('wpr-wishlist-empty-hidden') ) {
+							$scope.find('.wpr-wishlist-empty').addClass('wpr-wishlist-empty-hidden');
+						}
+					} else {
+						if ( !$scope.find('.wpr-wishlist-products').hasClass('wpr-wishlist-empty-hidden') ) {
+							$scope.find('.wpr-wishlist-products').addClass('wpr-wishlist-empty-hidden');
+						}
+
+						if ( $scope.find('.wpr-wishlist-empty').hasClass('wpr-wishlist-empty-hidden') ) {
+							$scope.find('.wpr-wishlist-empty').removeClass('wpr-wishlist-empty-hidden');
+						}
+					}
+				},
+				error: function(error) {
+					console.log(error);
+				}
+			});
+
+			$scope.on('click', '.wpr-wishlist-remove', function(e) {
 				e.preventDefault();
 				var product_id = $(this).data('product-id');
+
 				$.ajax({
 					url: WprConfig.ajaxurl,
 					type: 'POST',
@@ -7486,10 +7843,23 @@
 						action: 'remove_from_wishlist',
 						product_id: product_id
 					},
-					success: function() {
+					success: function(response) {
+						if ( 1 === $scope.find('.wpr-wishlist-product').length ) {	
+							if ( !$scope.find('.wpr-wishlist-products').hasClass('wpr-wishlist-empty-hidden') ) {
+								$scope.find('.wpr-wishlist-products').addClass('wpr-wishlist-empty-hidden');
+							}
+
+							if ( $scope.find('.wpr-wishlist-empty').hasClass('wpr-wishlist-empty-hidden') ) {
+								$scope.find('.wpr-wishlist-empty').removeClass('wpr-wishlist-empty-hidden');
+							}
+						}
+
            				$scope.find('.wpr-wishlist-product[data-product-id="' + product_id + '"]').remove();
 						WprElements.changeActionTargetProductId(product_id);
-						$(document).trigger('removed_from_wishlist');
+						$(document).trigger('removed_from_wishlist');	
+					},
+					error: function(error) {
+						console.log(error);
 					}
 				});
 			});
@@ -7506,7 +7876,26 @@
 
 		widgetWishlistButton: function($scope) {
 
-			// $(document).ready(function() {
+				$.ajax({
+					url: WprConfig.ajaxurl,
+					type: 'POST',
+					data: {
+						action: 'check_product_in_wishlist',
+						product_id: $scope.find('.wpr-wishlist-add').data('product-id')
+					},
+					success: function(response) {
+						if ( true == response ) {
+							if ( !$scope.find('.wpr-wishlist-add').hasClass('wpr-button-hidden') ) {
+								$scope.find('.wpr-wishlist-add').addClass('wpr-button-hidden');
+							}
+
+							if ( $scope.find('.wpr-wishlist-remove').hasClass('wpr-button-hidden') ) {
+								$scope.find('.wpr-wishlist-remove').removeClass('wpr-button-hidden');
+							}
+						}
+					}
+				});
+
 				$scope.find('.wpr-wishlist-add').click(function(e) {
 					e.preventDefault();
 					var product_id = $(this).data('product-id');
@@ -7534,7 +7923,7 @@
 						}
 					});
 				});
-				$scope.find('.wpr-wishlist-remove').click(function(e) {
+				$scope.find('.wpr-wishlist-remove').on('click', function(e) {
 					e.preventDefault();
 					var product_id = $(this).data('product-id');
 
@@ -7562,12 +7951,30 @@
 					$scope.find('.wpr-wishlist-add[data-product-id="' + actionTargetProductId + '"]').show();
 					$scope.find('.wpr-wishlist-add[data-product-id="' + actionTargetProductId + '"]').fadeTo(500, 1);
 				});
-
-			// });
 		
 		}, // end widgetWishlistButton
 
 		widgetCompareButton: function($scope) {
+
+			$.ajax({
+				url: WprConfig.ajaxurl,
+				type: 'POST',
+				data: {
+					action: 'check_product_in_compare',
+					product_id: $scope.find('.wpr-compare-add').data('product-id')
+				},
+				success: function(response) {
+					if ( true == response ) {
+						if ( !$scope.find('.wpr-compare-add').hasClass('wpr-button-hidden') ) {
+							$scope.find('.wpr-compare-add').addClass('wpr-button-hidden');
+						}
+
+						if ( $scope.find('.wpr-compare-remove').hasClass('wpr-button-hidden') ) {
+							$scope.find('.wpr-compare-remove').removeClass('wpr-button-hidden');
+						}
+					}
+				}
+			});
 
 			// $(document).ready(function() {
 				$scope.find('.wpr-compare-add').click(function(e) {
@@ -7684,6 +8091,7 @@
 						},
 						success: function(response) {
 							$scope.find('.wpr-compare-popup-inner-wrap').html(response.data.content);
+							WprElements.widgetCompare($scope);
 							
 							$scope.find('.wpr-compare-remove').click(function(e) {
 								e.preventDefault();
@@ -7740,6 +8148,28 @@
 
 			}
 
+			$.ajax({
+				url: WprConfig.ajaxurl,
+				type: 'POST',
+				data: {
+					action: 'count_compare_items',
+				},
+				success: function(response) {
+					if ( $scope.find('.wpr-compare-count').css('display') == 'none' && 0 < response.compare_count ) {
+						$scope.find('.wpr-compare-count').text(response.compare_count);
+						$scope.find('.wpr-compare-count').css('display', 'inline-flex');
+					} else if ( 0 == response.compare_count ) {
+						$scope.find('.wpr-compare-count').css('display', 'none');
+						$scope.find('.wpr-compare-count').text(response.compare_count);
+					} else {
+						$scope.find('.wpr-compare-count').text(response.compare_count);
+					}
+				},
+				error: function(error) {
+					console.log(error);
+				}
+			});
+
 			$(document).on('removed_from_compare', function() {
 				$.ajax({
 					url: WprConfig.ajaxurl,
@@ -7777,7 +8207,28 @@
 		}, // end widgetMiniCompare
 
 		widgetCompare: function($scope) {
-			$scope.find('.wpr-compare-remove').click(function(e) {
+			$.ajax({
+				url: WprConfig.ajaxurl,
+				type: 'POST',
+				data: {
+					action: 'count_compare_items',
+					remove_text: $scope.find('.wpr-compare-table-wrap').attr('remove_from_compare_text'),
+					compare_empty_text: $scope.find('.wpr-compare-table-wrap').attr('compare_empty_text'),
+					element_addcart_simple_txt: $scope.find('.wpr-compare-table-wrap').attr('element_addcart_simple_txt'),
+					element_addcart_grouped_txt: $scope.find('.wpr-compare-table-wrap').attr('element_addcart_grouped_txt'),
+					element_addcart_variable_txt: $scope.find('.wpr-compare-table-wrap').attr('element_addcart_variable_txt')
+				},
+				success: function(response) {
+					if ( true ) {
+						$scope.find('.wpr-compare-table-wrap').html(response.compare_table);
+					}
+				},
+				error: function(error) {
+					console.log(error);
+				}
+			});
+
+			$scope.on('click', '.wpr-compare-remove', function(e) {
 				e.preventDefault();
 				var productID = $(this).data('product-id');
 			
@@ -7816,6 +8267,12 @@
 
 			var fileUrl = {};
 
+			if ( $('body').find('.wpr-form-field-type-recaptcha-v3') ) {
+					var script = document.createElement('script');
+					script.src = 'https://www.google.com/recaptcha/api.js?render='+ $scope.find('#g-recaptcha-response').data('site-key') +'';
+					document.body.appendChild(script);
+			}
+
 			var currentTab = 0; // Current tab is set to be the first tab (0)
 			if ( 0 < $scope.find('.wpr-step-tab').length ) {
 				showTab(currentTab); // Display the current tab
@@ -7843,6 +8300,30 @@
 			});
 
 			$scope.find('input, select, textarea').each(function() {
+				$(this).on('change', function() {
+					var $this = $(this);
+					if ('checkbox' == $this.attr('type')) {
+						var $option = $this.closest('.wpr-form-field-option');
+						if ($option.hasClass('wpr-checked')) {
+							$option.removeClass('wpr-checked');
+						} else {
+							$option.addClass('wpr-checked');
+						}
+					} else if ('radio' == $this.attr('type')) {
+						// Find all radio buttons in the same group
+						var name = $this.attr('name');
+						var $group = $('input[type="radio"][name="' + name + '"]');
+				
+						// Remove 'wpr-checked' from all options in the group
+						$group.closest('.wpr-form-field-option').removeClass('wpr-checked');
+				
+						// Add 'wpr-checked' to the selected option
+						if ($this.is(':checked')) {
+							$this.closest('.wpr-form-field-option').addClass('wpr-checked');
+						}
+					}
+				});
+
 				$(this).on('input change keyup', function(e) {
 					if ( $(this).closest('.wpr-select-wrap').length > 0 ) {
 						$(this).closest('.wpr-select-wrap').removeClass('wpr-form-error-wrap');
@@ -8020,6 +8501,8 @@
 										$scope.find('form').append('<p class="wpr-submit-error">'+ $scope.data('settings').error_message +'</p>');
 									} else {
 										$scope.find('form').append('<p class="wpr-submit-success">'+ $scope.data('settings').success_message +'</p>');
+										$scope.find('button').attr('disabled', true);
+										$scope.find('button').css('opacity', 0.6);
 									}
 								});
 							// }
@@ -8327,14 +8810,14 @@
 						  }
 						},
 						error: function(error) {
-							// if ( 'filesize' === response.data.cause ) {
-							// 	let maxFileNotice = thisInput.data('maxfs-notice') ? thisInput.data('maxfs-notice') : response.data.message;
-							// 	thisInput.closest('.wpr-field-group').append('<p class="wpr-submit-error">' + maxFileNotice + '</p>');
-							// }
+							if ( 'filesize' === error.cause ) {
+								let maxFileNotice = thisInput.data('maxfs-notice') ? thisInput.data('maxfs-notice') : error.message;
+								thisInput.closest('.wpr-field-group').append('<p class="wpr-submit-error">' + maxFileNotice + '</p>');
+							}
 
-							// if ( 'filetype' == response.data.cause ) {
-							// 	thisInput.closest('.wpr-field-group').append('<p class="wpr-submit-error">' + response.data.message + '</p>');
-							// }
+							if ( 'filetype' == error.cause ) {
+								thisInput.closest('.wpr-field-group').append('<p class="wpr-submit-error">' + error.message + '</p>');
+							}
 						  console.log(error);
 						  reject(error);
 						},
@@ -8453,7 +8936,11 @@
 
 				if (valid) {
 					$scope.find(".wpr-step").eq(currentTab).addClass("wpr-step-finish");
-				}
+				} else {
+                    if ( $scope.find(".wpr-step").eq(currentTab).hasClass('wpr-step-finish') ) {
+                        $scope.find(".wpr-step").eq(currentTab).removeClass('wpr-step-finish');
+                    }
+                }
 
 				return valid;
 			}
@@ -8464,6 +8951,10 @@
 				$step.removeClass("wpr-step-active");
 				//... and adds the "active" class on the current step:
 				$step.eq(n).addClass("wpr-step-active");
+
+                if ( $scope.find('.wpr-step-active').hasClass('wpr-step-finish') ) {
+                    $scope.find('.wpr-step-active').removeClass('wpr-step-finish');
+                }
 
 				const stepTabs = $scope.find('.wpr-step-tab');
 				const progressBarFill = $scope.find('.wpr-step-progress-fill');
@@ -8680,10 +9171,12 @@
 			
 			if ( !($scope.find('.wpr-wishlist-count').length > 0 && 0 == $scope.find('.wpr-wishlist-count').text()) ) {
 				$scope.find('.wpr-wishlist-count').css('display', 'inline-flex');
+			} else {
+
 			}
 			
 			function wishlistRemoveHandler() {
-				$scope.find('.wpr-wishlist-remove').click(function(e) {
+				$scope.find('.wpr-wishlist-remove').on('click', function(e) {
 					e.preventDefault();
 					var product_id = $(this).data('product-id');
 					$.ajax({
@@ -8711,6 +9204,56 @@
 			mutationObserver.observe($scope[0], {
 				childList: true,
 				subtree: true,
+			});
+
+			$.ajax({
+				url: WprConfig.ajaxurl,
+				type: 'POST',
+				data: {
+					action: 'count_wishlist_items',
+				},
+				success: function(response) {
+					if ( $scope.find('.wpr-wishlist-count').css('display') == 'none' && 0 < response.wishlist_count ) {
+						$scope.find('.wpr-wishlist-count').text(response.wishlist_count);
+						$scope.find('.wpr-wishlist-count').css('display', 'inline-flex');
+					} else if ( 0 == response.wishlist_count ) {
+						$scope.find('.wpr-wishlist-count').css('display', 'none');
+						$scope.find('.wpr-wishlist-count').text(response.wishlist_count);
+					} else {
+						$scope.find('.wpr-wishlist-count').text(response.wishlist_count);
+					}
+
+					if ( true ) {
+						// Get all elements with the class 'wpr-wishlist-product' and their product IDs
+						var productElements = $scope.find('.wpr-wishlist-product');
+						var productIds = productElements.map(function() {
+						  return $(this).data('product-id');
+						}).get();
+						
+						// Filter out the items in the response that match the product IDs
+						var newWishlistItems = response.wishlist_items.filter(function(item) {
+						  return !productIds.includes(item.product_id);
+						});
+
+						// Convert the wishlist_items to an array of product_ids for easier searching
+						var wishlistProductIds = response.wishlist_items.map(function(item) {
+							return item.product_id;
+						});
+
+						productElements.each(function() {
+						  var productId = $(this).data('product-id');
+						
+						  // If the product ID is not in the wishlistProductIds array, remove the element
+						  if (!wishlistProductIds.includes(productId)) {
+							$(this).remove();
+						  }
+						});
+
+						newWishlistItems.forEach(function(item) {
+							$scope.find('.wpr-wishlist-products').append('<li class="wpr-wishlist-product" data-product-id="'+ item.product_id +'"><a class="wpr-wishlist-product-img" href="'+ item.product_url +'">'+ item.product_image +'</a><div><a href="'+ item.product_url +'">'+ item.product_title +'</a><div class="wpr-wishlist-product-price">'+ item.product_price +'</div></div><span class="wpr-wishlist-remove" data-product-id="'+ item.product_id +'"></span></li>');
+						});
+					}
+				}
 			});
 
 			$(document).on('added_to_wishlist', function() {
@@ -8832,10 +9375,6 @@
 			var mutationObserver = new MutationObserver(function(mutations) {
 				if (  0 !== $scope.hasClass('wpr-wishlist-sidebar').length ) {
 					closeSideBar();
-
-					// if ( $scope.find('.wpr-mini-cart').data('close-cart-heading') ) {
-					// 	$scope.find('.wpr-close-cart h2').text($scope.find('.wpr-mini-cart').data('close-cart-heading').replace(/-/g, ' '));
-					// }
 				}
 				
 				$scope.find('.wpr-wishlist-product').on('click', '.wpr-wishlist-remove', function() {
@@ -9040,7 +9579,7 @@
 			}
 			
 			if ( $scope.find('.wpr-wishlist-remove').length ) {
-				$scope.find('.wpr-wishlist-remove').click(function(e) {
+				$scope.find('.wpr-wishlist-remove').on('click', function(e) {
 					e.preventDefault();
 					var product_id = $(this).data('product-id');
 					$.ajax({

@@ -1,0 +1,68 @@
+/*
+Theme Name: Blankslate Enfant
+Description: Theme enfant de Blankslate. Vous pouvez maintenant effectuer vos modifications en toute sécurité.
+Author: WPMarmite
+Author URI: https://wpmarmite.com
+Template: blankslate
+Version: 1.0
+
+/* Enter Your Custom CSS Here */
+
+#header {
+	display:none;
+}
+#sidebar {
+	display:none;
+}
+.header {
+	display:none;
+}
+#primary {
+	display:none;
+}
+#copyright {
+	display:none;
+}
+
+a{color:black;text-decoration:none}
+
+#number{background-color: black;}
+
+#form-field-numberform {
+    background-image: url("http://localhost/planty/wp-content/uploads/2023/10/plusmoin.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+}
+	
+.formcommander{
+	display:flex;
+	flex-direction: row;
+}
+
+#livraison{
+	margin-left: 20px;
+}
+
+.wpcf7-form-control-wrap{
+	width:400px;
+}
+
+.titre-form{
+	padding-bottom:29px;
+}
+
+
+@media screen and (min-width: 320px) and (max-width: 633px){
+	.formcommander{
+	display:flex;
+	flex-direction: column;
+}
+	
+	.wpcf7-form-control-wrap{
+	width:300px;
+}
+	#livraison{
+	margin-left: 0px;
+}
